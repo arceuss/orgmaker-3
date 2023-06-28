@@ -243,7 +243,7 @@ Organya 3   Ver3.0.0   Simple Help
     * This function is mostly for my own use.
 
 
-[]Export to wav format
+[] Export to wav format
     Was going to do, but was derailed. Not enough patience.
     Whether you use LPDIRECTSOUNDCAPTUREBUFFER,
     configure an event for the playback position of PRIMARYBUFFER
@@ -251,7 +251,7 @@ Organya 3   Ver3.0.0   Simple Help
     it's troublesome any way.
 
 
-[]Pan and Volume headers light up when you click on them.
+[] Pan and Volume headers light up when you click on them.
     They only light up in version 2.1.0. It has no significance.
     Clicking Select toggles the "Always Select Current Track" function.
 
