@@ -28,3 +28,5 @@
 //#define NUMDRAMITEM		39	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇP	// 2011.10.17 D
 #define NUMDRAMITEM		42	//ÇPÇQÅ{ÇTÅ{ÇXÅ{ÇP(îL)Å{ÇPÇPÅ{ÇR	// 2011.10.17 A
 
+#define MAXHORZMEAS	256
+

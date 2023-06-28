@@ -6,6 +6,8 @@
 #include "DefOrg.h"
 #include "OrgData.h"
 #include "rxoFunction.h"
+#include "Scroll.h"
+
 #define PI 3.14159265358979323846
 /*
 //編集用構造体///////////////
@@ -621,7 +623,7 @@ BOOL OrgData::CheckNoteTail(char tr)
 //[新]音符をPower倍に引き伸ばす
 BOOL OrgData::EnlargeAllNotes(int Power)
 {
-	if(Power<=0)return FALSE;
+	if(Power<=0) return FALSE;
 	int i,j;
 	NOTELIST *np;
 	for(i=0;i<16;i++){
@@ -646,7 +648,8 @@ BOOL OrgData::EnlargeAllNotes(int Power)
 	info.repeat_x = info.repeat_x * Power;
 	info.end_x = info.end_x * Power;
 	j = info.dot * Power;
-	if(j<=255)info.dot = (unsigned char)j;
+	if(j < 256 && j > 0) info.dot = (unsigned char)j;
+	scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
 	MakeMusicParts(info.line,info.dot);//パーツを生成
 	MakePanParts(info.line,info.dot);
 
@@ -693,7 +696,8 @@ BOOL OrgData::ShortenAllNotes(int Power)
 	info.end_x = info.end_x / Power;
 
 	j = info.dot / Power;
-	if(j>=1)info.dot = (unsigned char)j;
+	if(j < 256 && j > 0) info.dot = (unsigned char)j;
+	scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
 	MakeMusicParts(info.line,info.dot);//パーツを生成
 	MakePanParts(info.line,info.dot);
 

@@ -8,6 +8,7 @@
 
 #include "Sound.h"
 #include "rxoFunction.h"
+#include "Scroll.h"
 
 #define DEFVOLUME	200//255はVOLDUMMY。MAXは254
 #define DEFPAN		6
@@ -77,6 +78,7 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi,unsigned long flag)
 	if(flag & SETGRID){//グリッドを有効に
 		info.dot = mi->dot;
 		info.line = mi->line;
+		scr_data.ChangeHorizontalRange(info.dot * info.line * MAXHORZMEAS);
 		MakeMusicParts(info.line,info.dot);//パーツを生成
 		MakePanParts(info.line,info.dot);
 //		MessageBox(hWnd,"グリッド","",MB_OK);
@@ -675,14 +677,14 @@ void OrgData::InitOrgData(void)
 		info.tdata[i].wave_no = i*11;
 		MakeOrganyaWave(i, info.tdata[i].wave_no, info.tdata[i].pipi);
 	}
-	info.tdata[ 8].wave_no = 39;
-	info.tdata[ 9].wave_no = 32;
-	info.tdata[10].wave_no = 35;
-	info.tdata[11].wave_no = 34;
-	info.tdata[12].wave_no = 20;
-	info.tdata[13].wave_no = 33;
-	info.tdata[14].wave_no = 22;
-	info.tdata[15].wave_no = 40;
+	info.tdata[ 8].wave_no = 0;
+	info.tdata[ 9].wave_no = 2;
+	info.tdata[10].wave_no = 5;
+	info.tdata[11].wave_no = 6;
+	info.tdata[12].wave_no = 4;
+	info.tdata[13].wave_no = 8;
+	info.tdata[14].wave_no = 0;
+	info.tdata[15].wave_no = 0;
 	for(i = MAXMELODY; i < MAXTRACK; i++){
 		InitDramObject(dram_name[ info.tdata[i].wave_no ],i-MAXMELODY);
 	}
@@ -765,6 +767,7 @@ int OrgData::ReplaceFromUndoData()
 		CurrentUndoCursor--;
 	}
 	int j,cc,r;
+	MUSICINFO mi;
 	CurrentUndoCursor--;
 	r=0;
 	RedoEnable = true;
@@ -778,6 +781,13 @@ int OrgData::ReplaceFromUndoData()
 	for(j=0;j<16;j++){
 		memcpy(info.tdata[j].note_p , &ud_note[cc][j] ,  sizeof(NOTELIST)*4096);
 	}
+	org_data.GetMusicInfo(&mi);
+	for (j = 0; j < MAXMELODY; j++) {
+		MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
+	}
+	for (j = MAXMELODY; j < MAXTRACK; j++) {
+		InitDramObject(dram_name[mi.tdata[j].wave_no], j - MAXMELODY);
+	}
 	return r;
 }
 
@@ -786,6 +796,7 @@ int OrgData::ReplaceFromRedoData()
 {
 	if(!RedoEnable)return 1;
 	int j,cc,r;
+	MUSICINFO mi;
 	CurrentUndoCursor++;
 	r=0;
 	UndoEnable = true;
@@ -798,6 +809,13 @@ int OrgData::ReplaceFromRedoData()
 	memcpy(&info, &ud_tdata[cc] ,  sizeof(MUSICINFO));
 	for(j=0;j<16;j++){
 		memcpy(info.tdata[j].note_p , &ud_note[cc][j] ,  sizeof(NOTELIST)*4096);
+	}
+	org_data.GetMusicInfo(&mi);
+	for (j = 0; j < MAXMELODY; j++) {
+		MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi);
+	}
+	for (j = MAXMELODY; j < MAXTRACK; j++) {
+		InitDramObject(dram_name[mi.tdata[j].wave_no], j - MAXMELODY);
 	}
 	return r;
 

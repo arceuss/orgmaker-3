@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Sound.h"
 #include <string.h>//sprintfテスト用
+#include <stdio.h>
 
 #include "rxoFunction.h"
 
@@ -47,6 +48,7 @@ extern int sACrnt;	//範囲選択は常にｶﾚﾝﾄﾄﾗｯｸ
 extern int tra, ful ,haba; 
 extern void SetEZCWindowMessage(char *Mess);
 extern char TrackN[];
+extern char* gSelectedTheme;
 
 void ChangeTrackPlus(HWND hdwnd, int iValue){
 	char str[8];
@@ -134,6 +136,28 @@ void ChangeTrack(HWND hdwnd, int iTrack){
 	SetFocus(hWnd);
 }
 
+void LoadTrackBitmaps(HWND hdwnd) {
+	LoadSingleBitmap(hdwnd, IDC_BTN_SOLO, 31, 17, "B_SOLO");
+	LoadSingleBitmap(hdwnd, IDC_BTN_LOUPE1, 24, 24, "B_LOUPE_PLUS");
+	LoadSingleBitmap(hdwnd, IDC_BTN_LOUPE2, 24, 24, "B_LOUPE_MINUS");
+	LoadSingleBitmap(hdwnd, IDC_TRACK0, 14, 21, "B_TRACK_1");
+	LoadSingleBitmap(hdwnd, IDC_TRACK1, 14, 21, "B_TRACK_2");
+	LoadSingleBitmap(hdwnd, IDC_TRACK2, 14, 21, "B_TRACK_3");
+	LoadSingleBitmap(hdwnd, IDC_TRACK3, 14, 21, "B_TRACK_4");
+	LoadSingleBitmap(hdwnd, IDC_TRACK4, 14, 21, "B_TRACK_5");
+	LoadSingleBitmap(hdwnd, IDC_TRACK5, 14, 21, "B_TRACK_6");
+	LoadSingleBitmap(hdwnd, IDC_TRACK6, 14, 21, "B_TRACK_7");
+	LoadSingleBitmap(hdwnd, IDC_TRACK7, 14, 21, "B_TRACK_8");
+	LoadSingleBitmap(hdwnd, IDC_TRACK8, 14, 21, "B_TRACK_Q");
+	LoadSingleBitmap(hdwnd, IDC_TRACK9, 14, 21, "B_TRACK_W");
+	LoadSingleBitmap(hdwnd, IDC_TRACK10, 14, 21, "B_TRACK_E");
+	LoadSingleBitmap(hdwnd, IDC_TRACK11, 14, 21, "B_TRACK_R");
+	LoadSingleBitmap(hdwnd, IDC_TRACK12, 14, 21, "B_TRACK_T");
+	LoadSingleBitmap(hdwnd, IDC_TRACK13, 14, 21, "B_TRACK_Y");
+	LoadSingleBitmap(hdwnd, IDC_TRACK14, 14, 21, "B_TRACK_U");
+	LoadSingleBitmap(hdwnd, IDC_TRACK15, 14, 21, "B_TRACK_I");
+}
+
 BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam){
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域(トラック変更)
 	int i, j;
@@ -150,61 +174,7 @@ BOOL CALLBACK DialogTrack(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 		str[1]='\0';
 		SetDlgItemText(hdwnd,IDE_VIEWTRACK,str);
 		for(i = 0; i < MAXTRACK; i++)org_data.mute[i] = 0;
-		HANDLE hBmp;
-		hBmp = (HBITMAP)LoadImage( hInst, "B_SOLO", IMAGE_BITMAP, 31, 17, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_BTN_SOLO, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-		hBmp = (HBITMAP)LoadImage( hInst, "B_LOUPE_PLUS", IMAGE_BITMAP, 24, 24, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_BTN_LOUPE1, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-		hBmp = (HBITMAP)LoadImage( hInst, "B_LOUPE_MINUS", IMAGE_BITMAP, 24, 24, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_BTN_LOUPE2, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_1", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK0, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_2", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK1, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_3", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK2, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_4", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK3, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_5", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK4, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_6", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK5, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_7", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK6, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_8", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK7, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_Q", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK8, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_W", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK9, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_E", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK10, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_R", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK11, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_T", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK12, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_Y", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK13, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_U", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK14, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-
-		hBmp = (HBITMAP)LoadImage( hInst, "B_TRACK_I", IMAGE_BITMAP, 14, 21, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_TRACK15, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
+		LoadTrackBitmaps(hdwnd);
 
 		return 1;
 	case WM_MOUSEMOVE:

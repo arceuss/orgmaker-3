@@ -216,7 +216,7 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 }
 
 //フックプロシージャ
-UINT CALLBACK OFNHookProc(HWND hdlg, UINT msg, WPARAM wParam,LPARAM lParam)
+/*UINT CALLBACK OFNHookProc(HWND hdlg, UINT msg, WPARAM wParam,LPARAM lParam)
 {
 	RECT  rcWindow;
 	LPOFNOTIFY lpOfn = (LPOFNOTIFY)lParam;
@@ -254,46 +254,49 @@ UINT CALLBACK OFNHookProc(HWND hdlg, UINT msg, WPARAM wParam,LPARAM lParam)
 
     }
     return FALSE;
-}
+}*/
 
-char GetFileNameLoad(HWND hwnd,char *title, int OpenType)
+char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 {//ファイル名を取得(ロード)
 	OPENFILENAME ofn;
 	FILE *fp;
+	char mfile[MAX_PATH];
 //	char res;//ファイルオープンの結果
 
-	memset(&ofn,0,sizeof(OPENFILENAME));
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	memset(&mfile, '\0', MAX_PATH);
 //	strcpy(GetName,"*.pmd");
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner   = hwnd;
 	ofn.hInstance   = hInst;
 	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0全ての形式 [*.*]\0*.*\0\0";	// 2014.10.19 D
 	ofn.lpstrFilter = MessageString[IDS_STRING111];	// 2014.10.19 A
-	ofn.lpstrFile   = music_file;
+	ofn.lpstrFile   = mfile;
 	ofn.nMaxFile    = MAX_PATH;
 	ofn.lpstrTitle  = title;
-	ofn.Flags       = OFN_CREATEPROMPT | OFN_HIDEREADONLY ;
-	if(OpenType==1){
+	ofn.Flags       = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	/*if(OpenType==1){
 		ofn.Flags       = OFN_CREATEPROMPT | OFN_HIDEREADONLY |OFN_EXPLORER | 
 						OFN_ENABLESIZING | OFN_ENABLEHOOK |     //フックプロシージャを使う
 							OFN_ENABLETEMPLATE; 
 		ofn.lpfnHook = OFNHookProc;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_DIALOGOPEN);
 
-	}
+	}*/
 	ofn.lpstrDefExt = "org";
 	
 	count_of_INIT_DONE = 0;
 	//ファイル名取得を試みる。
 	if(GetOpenFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
 	else return MSGCANCEL;//キャンセルで0が返る
-	fp = fopen(music_file,"rb");
+	fp = fopen(mfile,"rb");
 	if(fp == NULL){
 		//MessageBox(hwnd,"ファイルにアクセスできません","",MB_OK);	// 2014.10.19 D
 		msgbox(hwnd,IDS_WARNING_ACCESS_FILE,IDS_ERROR,MB_OK);	// 2014.10.19 A
 		return MSGCANCEL;//指定ファイルが存在しない
 	}
 	fclose(fp);
+	strcpy(music_file, mfile);
 
 	return MSGLOADOK;
 }

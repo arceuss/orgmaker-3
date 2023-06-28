@@ -3,7 +3,7 @@
 #define _WIN32_WINDOWS	0x0410
 #define _WIN32_IE		0x0400
 #define BUF_SIZE 256
-//#define HENKOU_NO_SHIRUSHI	" [変更アリ]"
+//#define HENKOU_NO_SHIRUSHI	"[change ants]"
 
 #define MAIN_WINDOW "WINDOW"
 #define COMMON_WINDOW "COMMONDIALOG"
@@ -37,7 +37,7 @@
 #include "Sound.h"
 #include "Timer.h"
 
-//メインプロシージャ
+//main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
 BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogDefault(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -55,64 +55,73 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-void SetTitlebarText(char *name);
-void SetTitlebarChange(void);
-void ResetTitlebarChange(void);
+void SetModified(bool mod);
 void CheckLoupeMenu(void);
 
-//ここに広域変数を宣言する
-HINSTANCE hInst;//インスタンスハンドル
-HWND hWnd;//メインウィンドウハンドル
+//Declare global variables here
+HINSTANCE hInst;//instance handle
+HWND hWnd;//main window handle
 HWND hDlgPlayer;
 HWND hDlgTrack;
 HWND hDlgEZCopy;
 HWND hDlgHelp = NULL;
 BOOL actApp;
 
+bool gIsDrawing = false;
+bool gFileModified = false;
+bool gFileUnsaved = true;
+
+long MAXHORZRANGE = 4096;
 
 int WWidth = WINDOWWIDTH, WHeight = WINDOWHEIGHT;
 
-char lpszName[MAX_PATH+15];// = "オルガーニャ２ - ";//ウインドウズ上に登録する名前
+char lpszName[MAX_PATH+20];// = "Organya 2 - ";//Name to register on Windows
 
-ORGDATA org_data;//メインデータ
-SCROLLDATA scr_data;//スクロールデータ
-MOUSEDATA mouse_data;//マウスデータ
-extern char music_file[];//ファイルネーム
-extern int sGrid;	//範囲選択はグリッド単位で
-extern int sACrnt;	//範囲選択は常にｶﾚﾝﾄﾄﾗｯｸ
+ORGDATA org_data;//main data
+SCROLLDATA scr_data;//scroll data
+MOUSEDATA mouse_data;//mouse data
+extern char music_file[];//file name
+extern int sGrid;	//Range selection in grid units
+extern int sACrnt;	//Range selection always on current track
 
+int sMetronome = 0;
+int sSmoothScroll = 0;
+
+extern void LoadTrackBitmaps(HWND hdwnd);
+extern void LoadPlayerBitmaps(HWND hdwnd);
 extern void ChangeTrack(HWND hdwnd, int iTrack);
 extern void ChangeTrackPlus(HWND hdwnd, int iValue);
-extern char timer_sw; //演奏中？
-extern EZCopyWindowState; //イージーコピーの状態
-extern void ClearEZC_Message(); //EZメッセージと範囲を消す
+extern char timer_sw; //Playing?
+extern int EZCopyWindowState; //Easy copy status
+extern void ClearEZC_Message(); //Erase EZ messages and ranges
 extern RECT CmnDialogWnd;
-extern int SaveWithInitVolFile;	//曲データと…セーブするか。
+extern int SaveWithInitVolFile;	//Song data and... save.
 extern int Menu_Recent[];
 extern int iDragMode;
-extern int iDlgRepeat; //ダイアログから取得した繰り返し回数
+extern int iDlgRepeat; //Iteration count obtained from the dialog
 extern char strMIDI_TITLE[256];
 extern char strMIDI_AUTHOR[256];
 extern unsigned char ucMIDIProgramChangeValue[MAXTRACK];
 
-//ウィンドウサイズ保存用
+//for saving window size
 RECT WinRect;
 CHAR *buf;
 CHAR app_path[BUF_SIZE];
 CHAR num_buf[BUF_SIZE];
-//ここまで
+//to this point
 
 
 void SaveIniFile();
 
-//オープニングフラッシュ
+//opening flash
 //#define WAITFLASH	256
 //BOOL    CALLBACK DialogFlash(HWND, UINT, WPARAM, LPARAM);
 int gWidthWindow;
 int gHeightWindow;
 
-int gDrawDouble;	//両方のトラックグループを描画する
+int gDrawDouble;	//draw both trackgroups
 
 int iChgTrackKey[16] = {
 	ID_AC_1,	ID_AC_2,	ID_AC_3,	ID_AC_4,	ID_AC_5,	ID_AC_6,	ID_AC_7,	ID_AC_8,
@@ -135,32 +144,63 @@ int iKeyPushDown[256]; // 2010.09.22 A
 
 char *strMIDIFile;
 
+char *gSelectedTheme;
+
 int CancelDeleteCurrentData(int iMessagePattern = 1){
 	if(iChangeFinish!=0){	// A 2010.09.22
-		char cc[512],*chn;
-		GetWindowText(hWnd,cc,512);
-		//chn = strstr(cc, HENKOU_NO_SHIRUSHI);	// 2014.10.19 D
-		chn = strstr(cc, MessageString[IDS_MODIFIED]);	// 2014.10.19 A
-		if(chn!=NULL){
-			//変更があったときは終了確認する。 // A 2010.09.22
+		if(gFileModified){
+			//Confirm the end when there is a change. // A 2010.09.22
 			if(iMessagePattern == 0){
-				//if(MessageBox(hWnd,"保存していない内容は破棄されます。初期化しますか？", "初期化確認",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				if(msgbox(hWnd,IDS_NOTIFY_INITIALIZE, IDS_NOTIFY_TITLE_INITALIZE,MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 A
+				//if(MessageBox(hWnd,"Any unsaved content will be discarded. Initialize?", "Initialization confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
+				if(msgbox(hWnd,IDS_NOTIFY_INITIALIZE, IDS_NOTIFY_TITLE_INITALIZE,MB_OKCANCEL | MB_ICONWARNING)==IDCANCEL)return 1;	// 2014.10.19 A
 			}else if(iMessagePattern == 1){
-				//if(MessageBox(hWnd,"保存していない内容は破棄されます。終了しますか？", "終了確認",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				if(msgbox(hWnd,IDS_NOTIFY_EXIT, IDS_NOTIFY_TITLE_EXIT,MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 A
+				//if(MessageBox(hWnd,"Any unsaved content will be discarded. Are you sure you want to quit?", "end confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
+				if(msgbox(hWnd,IDS_NOTIFY_EXIT, IDS_NOTIFY_TITLE_EXIT,MB_OKCANCEL | MB_ICONWARNING)==IDCANCEL)return 1;	// 2014.10.19 A
 			}else if(iMessagePattern == 2){
-				//if(MessageBox(hWnd,"保存していない内容は破棄されます。ファイルをロードしますか？", "ロード確認",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				if(msgbox(hWnd,IDS_NOTIFY_LOAD, IDS_NOTIFY_TITLE_LOAD,MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 A
+				//if(MessageBox(hWnd,"Any unsaved content will be discarded. do you want to load the file?", "load confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
+				if(msgbox(hWnd,IDS_NOTIFY_LOAD, IDS_NOTIFY_TITLE_LOAD,MB_OKCANCEL | MB_ICONWARNING)==IDCANCEL)return 1;	// 2014.10.19 A
 			}
 		}
 	} 
 	return 0;
 }
 
+void InitBitmaps() {
+	InitBitmap("MUSIC", BMPMUSIC);//piano roll
+	InitBitmap("NOTE", BMPNOTE);//Note
+	InitBitmap("NUMBER", BMPNUMBER);//number
+	InitBitmap("PAN", BMPPAN);//Pan and volume
+}
+
+void ReloadBitmaps() {
+	MUSICINFO mi;
+	RECT rect = { 0,0,WWidth,WHeight };//Area to update (track change)
+	org_data.GetMusicInfo(&mi);
+	
+	InitBitmaps();
+	LoadPlayerBitmaps(hDlgPlayer);
+	LoadTrackBitmaps(hDlgTrack);
+
+	MakeMusicParts(mi.line, mi.dot);
+	MakePanParts(mi.line, mi.dot);
+
+	org_data.PutMusic();
+	RedrawWindow(hWnd, &rect, NULL, RDW_INVALIDATE | RDW_ERASENOW);
+}
+
+void GetApplicationPath(char* path) {
+	char pth[MAX_PATH];
+	char drv[MAX_PATH];
+	char dir[MAX_PATH];
+	DWORD length = GetModuleFileName(NULL, pth, MAX_PATH);
+	_splitpath(pth, drv, dir, NULL, NULL);
+	strcat(drv, dir);
+	strcpy(path, drv);
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile,int nCmdShow)
-{//メイン関数
-	MSG msg;//このアプリが使うパラメータ	
+{//main function
+	MSG msg;//Parameters used by this app	
 	WNDCLASSEX wc;
 //	MessageBox(hWnd,dropfile,"Drap",MB_OK);
 	InitMMTimer();  // 2010.09.21
@@ -175,16 +215,16 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		iKeyPushDown[vvv]=0;
 	}
 
-	//メッセージ用ストリングをロードする
+	//load strings for messages
 	AllocMessageStringBuffer();
 
-	//初期ファイル名
+	//initial file name
 	strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 
 	iCast['Z']= 33;
 	iCast['S']= 34;
 	iCast['X']= 35;
-	iCast['C']= 36; //C … Cの音
+	iCast['C']= 36; //C … C sound
 	iCast['F']= 37;
 	iCast['V']= 38; //     D
 	iCast['G']= 39;
@@ -201,33 +241,34 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iCast[0xE2]=50; //￥
 	iCast[0xDD]=51; //]
 	strMIDIFile = (char *)malloc(MAX_PATH);
+	gSelectedTheme = (char *)malloc(MAX_PATH);
 
-	HACCEL Ac; //ショートカットキー用
+	HACCEL Ac; //for shortcut keys
 
 	LoadString(GetModuleHandle(NULL), IDS_TITLE, lpszName, sizeof(lpszName) / sizeof(lpszName[0]));
 
 	wc.cbSize        = sizeof(WNDCLASSEX);
-	wc.style         = 0;//CS_DBLCLKS| CS_OWNDC;//アプリケーションのスタイル
+	wc.style         = 0;//CS_DBLCLKS| CS_OWNDC;//Application style
 	wc.lpfnWndProc   = (WNDPROC)WndProc;
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = hInst = hInstance;
-	wc.hIcon         = LoadIcon(hInst,"ICON");//大きいアイコン
-	wc.hIconSm       = LoadIcon(hInst,"ICON");//小さいアイコン
-	wc.hCursor       = LoadCursor(hInst,"CURSOR");//カーソル
-	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);//ウインドウの気本色
-	wc.lpszMenuName  = "ORGANYAMENU";//メニ	ュー
+	wc.hIcon         = LoadIcon(hInst,"ICON");//big icon
+	wc.hIconSm       = LoadIcon(hInst,"ICON");//small icon
+	wc.hCursor       = LoadCursor(hInst,"CURSOR");//cursor
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);//window color
+	wc.lpszMenuName  = "ORGANYAMENU";//menu
 	wc.lpszClassName = lpszName;
 
-	int wnd_width;///ここでWindowの広さを指定します。
+	int wnd_width;///Specify the width of the window here.
 	int wnd_height;
-	gWidthWindow = wnd_width = GetSystemMetrics(SM_CXFRAME)*2+//フレームの幅
-		GetSystemMetrics(SM_CXHSCROLL)+//スクロールバーの幅
+	gWidthWindow = wnd_width = GetSystemMetrics(SM_CXFRAME)*2+//width of the frame
+		GetSystemMetrics(SM_CXHSCROLL)+//scrollbar width
 		WWidth;
-	gHeightWindow = wnd_height = GetSystemMetrics(SM_CYFRAME)*2 +//フレームの高さ
-		GetSystemMetrics(SM_CYCAPTION)+//キャプションの高さ
-		GetSystemMetrics(SM_CYMENU)+//メニューバーの高さ
-		GetSystemMetrics(SM_CYVSCROLL)+//スクロールバーの高さ
+	gHeightWindow = wnd_height = GetSystemMetrics(SM_CYFRAME)*2 +//frame height
+		GetSystemMetrics(SM_CYCAPTION)+//caption height
+		GetSystemMetrics(SM_CYMENU)+//menu bar height
+		GetSystemMetrics(SM_CYVSCROLL)+//scrollbar height
 		WHeight;
 
 	if(!RegisterClassEx(&wc)) return FALSE;
@@ -239,7 +280,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	}else{
 		lstrcat(app_path,".ini");
 	}
-	//NoteWidth = 16; //幅指定★
+	//NoteWidth = 16; //Frame designation★
 	NoteWidth =         GetPrivateProfileInt(MAIN_WINDOW,"NoteWidth",16,app_path);
 	NoteWidth = (NoteWidth > 16) ? 16: ( (NoteWidth<4) ? 4: NoteWidth );
 
@@ -254,9 +295,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	iDlgRepeat =        GetPrivateProfileInt(MIDI_EXPORT,"Repeat",1,app_path);
 
 	char strauthtmp[128];
-	SYSTEMTIME stTime; GetLocalTime(&stTime); //stTime.wYear で年取得	// 2014.10.18
+	SYSTEMTIME stTime; GetLocalTime(&stTime); //stTime.wYear get a year in // 2014.10.18
 	strcpy(strauthtmp, "(C) AUTHOR xxxxx,                 ");
-	sprintf(strauthtmp + 18, "%d", stTime.wYear); //,の後ろに西暦を入れる
+	sprintf(strauthtmp + 18, "%d", stTime.wYear); //, put the year after
 
 	//GetPrivateProfileString(MIDI_EXPORT, "Author", "(C) AUTHOR xxxxx, 2014", strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 D
 	GetPrivateProfileString(MIDI_EXPORT, "Author", strauthtmp, strMIDI_AUTHOR, 255, app_path);	// 2045.01.18 A
@@ -268,17 +309,17 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	unsigned long ul;
 	ul = WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX;
 
-	//メインウインドウの生成
+	//Generate main window
 	hWnd = CreateWindow(lpszName,
-			"オルガーニャ",//表示される"名前"
+			"Organya 3",//Displayed "Name"
 			ul,
 			//WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX,
-//            WS_CAPTION|WS_VISIBLE|WS_SYSMENU,//ウィンドウのスタイル
+//            WS_CAPTION|WS_VISIBLE|WS_SYSMENU,//window style
 /*
-            32,//WindowのX
-			32,//WindowのY
-            wnd_width,//幅
-            wnd_height,//高さ
+            32,//Window's X
+			32,//Window's Y
+            wnd_width,//width
+            wnd_height,//height
 			*/
 			WinRect.left, WinRect.top, WinRect.right, WinRect.bottom,
             NULL, NULL, hInst, NULL);
@@ -288,16 +329,25 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	Ac=LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_ACCELERATOR1)); //アクセスキー
 
-//画像の初期化//////////
-	StartGDI(hWnd);//GDI準備
-	InitBitmap("MUSIC",BMPMUSIC);//ピアノロール
-	InitBitmap("NOTE",BMPNOTE);//音符
-	InitBitmap("NUMBER",BMPNUMBER);//数字
-	InitBitmap("PAN",BMPPAN);//パンとボリューム
-//サウンドの初期化///////
+	char sDir[MAX_PATH];
+	GetApplicationPath(sDir);
+	strcat(sDir, "themes");
+	CreateDirectory(sDir, NULL);
+
+	GetPrivateProfileString(MAIN_WINDOW, "CurrentThemePath", NULL, gSelectedTheme, MAX_PATH, app_path); //2023.06.10
+	if (strlen(gSelectedTheme) > 0) {
+		DWORD dwAttrib = GetFileAttributes(gSelectedTheme);
+		if (dwAttrib == INVALID_FILE_ATTRIBUTES || !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
+			gSelectedTheme[0] = 0; // Theme is gone
+	}
+
+//Image initialization //////////
+	StartGDI(hWnd);//GDI ready
+	InitBitmaps();
+//Sound initialization ///////
 	InitDirectSound(hWnd);
-//	LoadWaveData100(); //ファイル"Wave.dat"からロードする
-	InitWaveData100(); //レジストリ"WAVE100"からロードする
+//	LoadWaveData100(); //Load from file "Wave.dat"
+	InitWaveData100(); //Load from registry "WAVE100"
 	scr_data.InitScroll();
 	
 	hDlgPlayer = CreateDialog(hInst,"PLAYER",hWnd,DialogPlayer);
@@ -327,32 +377,34 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	ChangeDrawDouble(GetPrivateProfileInt(MAIN_WINDOW,"DrawDouble",1,app_path));
 	ChangeDragMode(GetPrivateProfileInt(MAIN_WINDOW,"DragMode",1,app_path));
 	ChangeEnablePlaying(GetPrivateProfileInt(MAIN_WINDOW,"EnablePlaying",1,app_path));
-	ChangeFinish(GetPrivateProfileInt(MAIN_WINDOW,"QuitMessage",0,app_path));
+	ChangeFinish(GetPrivateProfileInt(MAIN_WINDOW,"QuitMessage",1,app_path));
 	ChangeSlideOverlapNoteMode(GetPrivateProfileInt(MAIN_WINDOW,"SlideOverlapNoteMode",1,app_path));
 	ChangePushStratchNOTE(GetPrivateProfileInt(MAIN_WINDOW,"EnablePressNoteStretch",1,app_path));
-	ChangeNoteEnlarge(GetPrivateProfileInt(MAIN_WINDOW,"NoteEnlarge",1,app_path)); //2014.05.28 縮小表示時、音符の頭を目立たせる(&O)
+	ChangeNoteEnlarge(GetPrivateProfileInt(MAIN_WINDOW,"NoteEnlarge",1,app_path)); //2014.05.28 Make note heads stand out when zoomed out
+	ChangeMetronomeMode(GetPrivateProfileInt(MAIN_WINDOW,"Metronome",0,app_path)); //2023.06.09
+	ChangeScrollMode(GetPrivateProfileInt(MAIN_WINDOW, "SmoothScroll", 1, app_path)); //2023.06.09
 	
-	org_data.PutMusic();//楽譜を表示
+	org_data.PutMusic();//View sheet music
 
 	if(GetPrivateProfileInt(MAIN_WINDOW,"WindowState",0,app_path)==1){
 		ShowWindow(hWnd,SW_MAXIMIZE);
 	}else{
-		ShowWindow(hWnd,nCmdShow);//メインウインドウ表示
+		ShowWindow(hWnd,nCmdShow);//Main window display
 	}
-	UpdateWindow(hWnd);//メインウィンドウの更新
+	UpdateWindow(hWnd);//Update main window
 
-	DragAcceptFiles(hWnd,TRUE);//これでドラッグ許可
-	//プレイヤーダイアログ(モーダレス)の生成
+	DragAcceptFiles(hWnd,TRUE);//Now allow dragging
+	//Generate player dialog (modalless)
 
 	//if(GetPrivateProfileInt(MAIN_WINDOW,"WindowState",0,app_path)==1){
 	//	ShowWindow(hWnd,SW_MAXIMIZE);
 	//}
 
-	SetTitlebarText(music_file);//タイトルネームセット
-	ClearVirtualCB(); //ヴァーチャルクリップボード初期化
+	SetModified(false);//title name set
+	ClearVirtualCB(); //Initialize the virtual clipboard
 	ClearUndo();
 
-			//プレイヤーに表示
+			//Show to Player
 	MUSICINFO mi;
 			org_data.GetMusicInfo( &mi );
 			SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
@@ -363,7 +415,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	if(dropfile[0]!=0){
 		strcpy(kfn,dropfile);
 		int ttt;
-		if(dropfile[0]=='\"'){	//引用符を取り除く
+		if(dropfile[0]=='\"'){	//remove quotes
 			ttt = 1;
 		}else{
 			ttt = 0;
@@ -374,7 +426,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		//MessageBox(hWnd,gfn,"Error(Load)",MB_OK);
 		fp=fopen(gfn,"rb");
 		if(fp==NULL){
-			//MessageBox(hWnd,"読み込みに失敗しました","Error(Load)",MB_OK); //D 2010.09.28
+			//MessageBox(hWnd,"Failed to read","Error(Load)",MB_OK); //D 2010.09.28
 		}else{
 			char pass_chek[3];
 			bool b_OrgFile = false;
@@ -382,35 +434,38 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 			b_OrgFile = (pass_chek[0]==0x4F) && (pass_chek[1]==0x72) && (pass_chek[2]==0x67); //'O', 'r', 'g'
 			fclose(fp);
 			//memcpy(music_file,dropfile,MAX_PATH);
-			if(b_OrgFile){ //A 2010.09.25 なんとなくOrg形式のファイルだった場合
+			if(b_OrgFile){ //A 2010.09.25 If the file is in Org format
 				strcpy(music_file, gfn);
-				if(org_data.LoadMusicData()==TRUE){ //C 2010.09.25 判定追加
-					SetTitlebarText(music_file);//タイトルネームセット
+				if(org_data.LoadMusicData()==TRUE){ //C 2010.09.25 Judgment added
+					SetModified(false);//title name set
+                    gFileUnsaved = false;
 					org_data.GetMusicInfo( &mi );
 					SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 					SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
-					ClearEZC_Message();	SelectReset();	org_data.PutMusic();
+					ClearEZC_Message();
+					SelectReset();
+					org_data.PutMusic();
 				}else{
-					//ORGフォーマットのファイルではなかったので //A 2010.9.25
-					//ファイル名クリア
+					//Because it was not an ORG format file //A 2010.9.25
+					//File name clear
 					strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 				}
 			}
 		}
 	}
 	QuitMMTimer(); //A 2010.09.21
-	//メッセージループを生成(メインループ)
+	//Generate message loop (main loop)
 	while(GetMessage(&msg,NULL,0,0)){
 //		if(!TranslateAccelerator(hwnd,hAccel,&msg)){
-		//ダイアログ向けのメッセージじゃなければ
+		//Unless the message is for a dialog
 		if(!TranslateAccelerator(hWnd,Ac,&msg))
         {
 			if(!IsDialogMessage(hDlgPlayer,&msg)){
 				if(!IsDialogMessage(hDlgTrack,&msg)){
 					if(!IsDialogMessage(hDlgEZCopy,&msg)){
 						if(!IsDialogMessage(hDlgHelp,&msg)){
-							TranslateMessage(&msg);//キーボード使用可能
-							DispatchMessage(&msg);//制御をWindowsに戻す
+							TranslateMessage(&msg);//keyboard available
+							DispatchMessage(&msg);//Return control to Windows
 						}
 					}				
 				}
@@ -419,19 +474,20 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				//DispatchMessage(&msg);
         }
 	}
-	//MessageBox(NULL, "メッセージループを抜けました", "OK", MB_OK);
+	//MessageBox(NULL, "message loop exited", "OK", MB_OK);
 
 	DestroyAcceleratorTable (Ac);
-	return msg.wParam;//ここでアプリケーションは終了
+	return msg.wParam;//application ends here
 }
-//メインプロシージャ
+
+//main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 //	char str[64];
-	int i, j;	// 2014.10.18 jを追加
+	int i, j;	// 2014.10.18 Added j
 	char res;
 	bool AfterReSize=false;
-	RECT rect = {0,0,WWidth,WHeight};//更新する領域(トラック変更)
+	RECT rect = {0,0,WWidth,WHeight};//Area to update (track change)
 	MUSICINFO mi;
 	MINMAXINFO *pmmi;
 
@@ -464,35 +520,41 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 			}
 		}
-		for(i=0;i<10;i++){	//最近使ったファイル
+		for(i=0;i<10;i++){	//recently used files
 			if(LOWORD(wParam)==Menu_Recent[i]){
 				if(CancelDeleteCurrentData(CDCD_LOAD))break;
-				SetLoadRecentFile(i);	org_data.InitOrgData();	org_data.LoadMusicData();
-				SetTitlebarText(music_file);//タイトルネームセット
+				SetLoadRecentFile(i);
+				ClearUndo(); // 2023.06.10 Someone forgot to put this here
+				org_data.InitOrgData();
+				org_data.LoadMusicData();
+				SetModified(false);//title name set
+                gFileUnsaved = false;
 				org_data.GetMusicInfo( &mi );
 				SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 				SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
-				ClearEZC_Message();	SelectReset();	org_data.PutMusic();
+				ClearEZC_Message();
+				SelectReset();
+				org_data.PutMusic();
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				//for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;	// 2014.10.18 D
 				for(j=0;j<8;j++)ucMIDIProgramChangeValue[j]=255;	// 2014.10.18 A
 				break;	// 2014.10.18 A
 			}
 		}
-		if(timer_sw==0){ //演奏中はいやよ
+		if(timer_sw==0){ //no while playing
 			switch(LOWORD(wParam)){
 			case ID_AC_LOAD_MOST_RECENT:
 				SendMessage(hWnd, WM_COMMAND, Menu_Recent[0],0);
 				break;
-			case IDM_SORTMUSICNOTE: //ソートする
+			case IDM_SORTMUSICNOTE: //to sort
 				SetUndo();
 				SortMusicNote();
 				break;
-			case IDM_DLGSETTING://設定ダイアログを表示
+			case IDM_DLGSETTING://Show settings dialog
 			case ID_AC_SETTEMPO:
 				DialogBox(hInst,"DLGSETTING",hwnd,DialogSetting);
 				break;
-			case IDM_DLGDEFAULT://デフォルトダイアログを表示
+			case IDM_DLGDEFAULT://Show Default Dialog
 			case ID_AC_DEFAULT:
 				DialogBox(hInst,"DLGDEFAULT",hwnd,DialogDefault);
 				break;
@@ -529,7 +591,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_DLGUSED://
 				DialogBox(hInst,"DLGUSED",hwnd,DialogNoteUsed);
 				break;
-			case IDM_DLGWAVE://設定ダイアログを表示
+			case IDM_DLGWAVE://Show settings dialog
 			case ID_AC_WAVESELECT:
 				DialogBox(hInst,"DLGWAVE",hwnd,DialogWave);
 				break;
@@ -540,6 +602,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_DLGMEMO://
 				PlaySound( "CAT" , GetModuleHandle(NULL),SND_RESOURCE | SND_ASYNC); 
 				DialogBox(hInst,"DLGMEMO",hwnd,DialogMemo);
+				break;
+			case IDM_DLGTHEMES:
+				DialogBox(hInst, "DLGTHEMES", hwnd, DialogTheme);
 				break;
 			case IDM_DLGHELP://
 			case ID_AC_HELP:
@@ -552,52 +617,63 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_SAVEOVER:
 			case ID_AC_MENUOVERSAVE:
+                if (gFileUnsaved) {
+                    res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
+                    if(res == MSGCANCEL)break;
+                    if(res == MSGEXISFILE){
+                        //if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
+                        if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
+                            ==IDNO)break;
+                    }
+                }
 				org_data.SaveMusicData();
-				ResetTitlebarChange();
+				SetModified(false);
+                gFileUnsaved = false;
 				break;							  
-			case IDM_SAVENEW://別名で保存
+			case IDM_SAVENEW://Save As
 			case ID_AC_MENUNEWSAVE:
-				res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"別名で保存"
+				res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
 				if(res == MSGCANCEL)break;
 				if(res == MSGEXISFILE){
-					//if(MessageBox(hwnd,"上書きしますか？","同じ名前のファイルがあります",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
+					//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
 					if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
 						==IDNO)break;
 				}
 				org_data.SaveMusicData();
-				SetTitlebarText(music_file);//タイトルネームセット
-				ResetTitlebarChange();
+				SetModified(false);//title name set
+                gFileUnsaved = false;
 				break;
-			case IDM_EXPORT_MIDI: //ｴｸｽﾎﾟｰﾄ 2014.05.11
+			case IDM_EXPORT_MIDI: //Export 2014.05.11
 			case ID_AC_MIDI:
 				
-				res = GetFileNameMIDI(hwnd,MessageString[IDS_STRING63], strMIDIFile );//"標準MIDI形式でｴｸｽﾎﾟｰﾄ"
+				res = GetFileNameMIDI(hwnd,MessageString[IDS_STRING63], strMIDIFile );//"Export in standard MIDI format"
 				if(res == MSGCANCEL)break;
 				if(res == MSGEXISFILE){
-					//if(MessageBox(hwnd,"上書きしますか？","同じ名前のファイルがあります",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
+					//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
 					if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
 						==IDNO)break;
 				}
 				org_data.ExportMIDIData(strMIDIFile, iDlgRepeat);
-				//SetTitlebarText(music_file);//タイトルネームセット
+				//SetTitlebarText();//title name set
 				//ResetTitlebarChange();
 				break;
-			case IDM_DUMMY_TATE_SEPARATOR: //何もしない
+			case IDM_DUMMY_TATE_SEPARATOR: //do nothing
 				break;
 			case IDM_LOAD:
 			case ID_AC_MENUOPEN:
-			case IDM_LOAD2:
-			case ID_AC_LOAD2:
-				if(CancelDeleteCurrentData(CDCD_LOAD))break;
-				i = 0;
-				if(LOWORD(wParam)==IDM_LOAD2 || LOWORD(wParam)==ID_AC_LOAD2)i=1; 
-				if(GetFileNameLoad(hWnd,MessageString[IDS_STRING61],i) != MSGLOADOK)break;//"曲データの読み込み"
+			    //case IDM_LOAD2:
+			    //case ID_AC_LOAD2:
+				if(CancelDeleteCurrentData(CDCD_LOAD)) break;
+				/*i = 0;
+				if(LOWORD(wParam)==IDM_LOAD2 || LOWORD(wParam)==ID_AC_LOAD2)i=1; */
+				if(GetFileNameLoad(hWnd,MessageString[IDS_STRING61]/*,i*/) != MSGLOADOK) break;//"Load song data"
 				
 				ClearUndo();
 				org_data.InitOrgData();
 				org_data.LoadMusicData();
-				SetTitlebarText(music_file);//タイトルネームセット
-				//プレイヤーに表示
+				SetModified(false);//title name set
+                gFileUnsaved = false;
+				//Show to Player
 				org_data.GetMusicInfo( &mi );
 				SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 				//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
@@ -615,8 +691,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				//	GetWindowText(hWnd,cc,512);
 				//	chn = strstr(cc, HENKOU_NO_SHIRUSHI);
 				//	if(chn!=NULL){
-				//		//変更があったときは終了確認する。 // A 2010.09.22
-				//		if(MessageBox(hwnd,"保存していない内容は破棄されます。終了しますか？","終了確認",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)break;
+				//		//Confirm the end when there is a change. // A 2010.09.22
+				//		if(MessageBox(hwnd,"Any unsaved content will be discarded. Are you sure you want to quit?","End confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)break;
 				//	}
 				//}
 				if(CancelDeleteCurrentData(CDCD_EXIT))break;
@@ -674,12 +750,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				itoa(mi.wait,str,10);
 				SetDlgItemText(hDlgTrack,IDE_VIEWWAIT,str);
 				break;
-			case IDM_CT_L1: //線形衰弱            IDM_CT_L1～9は連番であること！
-			case IDM_CT_L2: //上に凸衰弱
-			case IDM_CT_L3: //下に凸衰弱
-			case IDM_CT_L4: //ノーマライズ
-			case IDM_CT_L5: //グラデーション
-			case IDM_CT_L6: //ビブラート
+			case IDM_CT_L1: //Linear debility IDM_CT_L1 to 9 must be consecutive numbers!
+			case IDM_CT_L2: //Convex weakness
+			case IDM_CT_L3: //Convex weakness 2
+			case IDM_CT_L4: //Normalize
+			case IDM_CT_L5: //Gradation
+			case IDM_CT_L6: //vibrato
 			case IDM_CT_L7: //
 			case IDM_CT_L8: //
 			case IDM_CT_L9: //
@@ -693,13 +769,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_CT_L17:
 			case IDM_CT_L18:
 			case IDM_CT_L19:
-				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - IDM_CT_L1 + 1); //第一引数は0にすると空return されるので
+				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - IDM_CT_L1 + 1); //If the first argument is 0, it will be returned empty, so
 				break;
 			case IDM_CT_S0: 
 			case IDM_CT_S1: 
 			case IDM_CT_S2: 
 			case IDM_CT_S3: 
-			case IDM_CT_S4: //穴埋め
+			case IDM_CT_S4: //filling in holes
 			case IDM_CT_S5: 
 			case IDM_CT_S6: 
 			case IDM_CT_S7: 
@@ -715,10 +791,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_CT_S17: 
 			case IDM_CT_S18: 
 			case IDM_CT_S19: 
-			case IDM_CT_S20: //ｸﾘｱ
+			case IDM_CT_S20: //Clear
 				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - IDM_CT_S1 + 1 + 20);
 				break;
-			case ID_AC_C0://ｸﾘｱ
+			case ID_AC_C0://Clear
 				SetUndo(); VolumeDecayEdit(1, -4, IDM_CT_S20     - IDM_CT_S1 + 1 + 20); 
 				break;
 			case ID_AC_C1: //Ctrl+1
@@ -738,13 +814,13 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_CA3:
 				SetUndo(); VolumeDecayEdit(1, -4, LOWORD(wParam) - ID_AC_CA0 + 1 + 20 + 9);
 				break;
-			case ID_AC_PRESS_LEFT: //左クリックの代わり
+			case ID_AC_PRESS_LEFT: //instead of left click
 				ClickProcL(wParam, lParam);
 				break;
-			case ID_AC_PRESS_RIGHT: //右クリックの代わり
+			case ID_AC_PRESS_RIGHT: //instead of right click
 				ClickProcR(wParam, lParam);
 				break;
-			case ID_AC_CT_KEY_OCT_DOWN: //オクターブ下げる
+			case ID_AC_CT_KEY_OCT_DOWN: //octave down
 			case IDM_CT_OCT_DOWN:
 				SetUndo();
 				TransportNote(-12 , -4 );
@@ -764,7 +840,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SetUndo();
 				PanEdit( -1,-4 );
 				break;
-			case IDM_CT_PAN_REVERSE: //PAN逆転
+			case IDM_CT_PAN_REVERSE: //PAN reversal
 			case ID_AC_PAN_REVERSE:
 				SetUndo(); PanEdit( 254, -4 );
 				break;
@@ -839,7 +915,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_UNDO:
 			case ID_AC_UNDO:
 				ReplaseUndo();
-				org_data.PutMusic();//楽譜を表示
+				org_data.PutMusic();//View sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
@@ -848,7 +924,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_REDO:
 			case ID_AC_REDO:
 				ReplaceRedo();
-				org_data.PutMusic();//楽譜を表示
+				org_data.PutMusic();//View sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				org_data.GetMusicInfo( &mi );
 				itoa(mi.wait,str,10);
@@ -869,10 +945,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case IDM_AUTOLOADPVI:
 				ChangeAutoLoadMode();
 				break;
+			case IDM_METRONOME:
+				ChangeMetronomeMode();
+				break;
+			case IDM_SMOOTHSCROLL:
+				ChangeScrollMode();
+				break;
 			case IDM_ALWAYS_CURRENT:
 			case ID_AC_ALWAYS_CURRENT:
 				ChangeSelAlwaysCurrent();
-				org_data.PutMusic();//楽譜を表示
+				org_data.PutMusic();//View sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
 			case ID_AC_DRAWDOUBLE:
@@ -880,18 +962,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				ChangeDrawDouble();
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
-			case IDM_NOTE_ENLARGE: //    縮小表示時、音符の頭を目立たせる(&O) 2014.05.28
+			case IDM_NOTE_ENLARGE: //&Make note heads stand out when zoomed out 2014.05.28
 				ChangeNoteEnlarge();
-				org_data.PutMusic();//楽譜を表示
+				org_data.PutMusic();//View sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				break;
-			case IDM_ENABLEPLAYING: //演奏中に鍵盤を叩ける 2010.09.23 A
+			case IDM_ENABLEPLAYING: //You can hit the keyboard while playing 2010.09.23 A
 				ChangeEnablePlaying();
 				break;
-			case IDM_CHANGEFINISH: //終了時に確認する 2010.09.23 A
+			case IDM_CHANGEFINISH: //Confirm when finished 2010.09.23 A
 				ChangeFinish();
 				break;
-			case ID_AC_HOMEBACK: //ホーム
+			case ID_AC_HOMEBACK: //home
 				SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
 				break;
 			case IDM_RECENT_CLEAR:
@@ -915,7 +997,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_INIT:
 			case ID_AC_INIT:
-				//if(MessageBox(hwnd,"保存していない内容は破棄されます。初期化しますか？","初期化確認",MB_OKCANCEL)==IDCANCEL)break; //2010.09.25 A
+				//if(MessageBox(hwnd,"Any unsaved content will be discarded. Initialize?","Initialization confirmation",MB_OKCANCEL)==IDCANCEL)break; //2010.09.25 A
 				if(CancelDeleteCurrentData(CDCD_INIT))break;
 				ClearUndo();
 				memset(music_file, 0 , MAX_PATH);
@@ -926,13 +1008,14 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				org_data.InitOrgData();
 				org_data.SetPlayPointer(0);
 				scr_data.SetHorzScroll(0);
-				//プレイヤーに反映
+				//reflected in the player
 				SetDlgItemText(hDlgPlayer,IDE_VIEWWAIT,"128");
 				SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,"0");
 				SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");
-				SetTitlebarText(music_file);
-				//MessageBox(hwnd,"初期化しました","Message",MB_OK);
-				ClearEZC_Message(); //EZメッセージと範囲を消す
+				SetModified(false);
+                gFileUnsaved = true;
+				//MessageBox(hwnd,"initialized","Message",MB_OK);
+				ClearEZC_Message(); //Erase EZ messages and ranges
 				SelectReset();
 				org_data.PutMusic();
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -940,8 +1023,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 				break;
 				//↓	// 2010.12.01 A
-			case ID_AC_SELECT_CLEAR: //選択範囲を解除
-			case ID_AC_SELECT_CLEAR2: //選択範囲を解除 //2014.04.13
+			case ID_AC_SELECT_CLEAR: //Clear selection
+			case ID_AC_SELECT_CLEAR2: //Clear selection //2014.04.13
 				ClearEZC_Message();
 				org_data.PutMusic();
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
@@ -952,7 +1035,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_SELECT_INSERT: //2014.04.13
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_INSERTBUTTON  , NULL);
 				break;
-			//テンキー操作による範囲選択操作
+			//Range selection operation using the numeric keypad
 			case ID_AC_NUM1:
 				SendMessage(hDlgEZCopy , WM_COMMAND , IDC_CTB1 , NULL);
 				break;
@@ -1006,16 +1089,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			}
 		}else{
-			//演奏中のみ
-			//特に無し
+			//only while playing
+			//nothing especially
 		}
-		//演奏中でも可
+		//Possible even while playing
 		switch(LOWORD(wParam)){
 		case IDM_LOUPE_MINUS:
 		case ID_AC_LOUPE_MINUS:
 			NoteWidth -= 2; if(NoteWidth<4)NoteWidth=4;
 			org_data.PutBackGround();
-			org_data.PutMusic();//楽譜を表示
+			org_data.PutMusic();//View sheet music
 			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			switch(NoteWidth){
 			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25.%]"); break;
@@ -1032,7 +1115,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case ID_AC_LOUPE_PLUS:
 			NoteWidth += 2; if(NoteWidth>16)NoteWidth=16;
 			org_data.PutBackGround();
-			org_data.PutMusic();//楽譜を表示
+			org_data.PutMusic();//View sheet music
 			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			switch(NoteWidth){
 			case 4:		SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, "[25%]"); break;
@@ -1093,7 +1176,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case IDM_DLGHELP:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING102]); break;
 		case IDM_DLGMEMO:           SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING103]); break;		}
 		break;
-	case WM_DROPFILES://ファイルドロップ
+	case WM_DROPFILES://file drop
 		//SetWindowPos(hWnd, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE );
 		//SendMessage(hWnd, WM_PAINT, 0, 0);
 		//SetFocus(hWnd);
@@ -1102,7 +1185,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//DragQueryFile((HDROP)wParam,0,music_file,MAX_PATH);	// 2014.05.22 D
 		DragQueryFile((HDROP)wParam,0,strMIDIFile,MAX_PATH);	// 2014.05.22 A
 		if(org_data.FileCheckBeforeLoad(strMIDIFile)){
-			SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING64]); //<!>ファイルが開けない、または、形式が不正です。
+			SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING64]); //<!>The file cannot be opened or is in an invalid format.
 			break;
 		}
 		strcpy(music_file, strMIDIFile);
@@ -1111,36 +1194,40 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 //		MessageBox(hWnd,music_file,"",MB_OK);
 		org_data.InitOrgData();
 		org_data.LoadMusicData();
-		org_data.PutMusic();//楽譜を表示
+		org_data.PutMusic();//View sheet music
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-			//プレイヤーに表示
-			org_data.GetMusicInfo( &mi );
-			SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
-			//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
-			SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
-		SetTitlebarText(music_file);//タイトルネームセット
+		//Show to Player
+		org_data.GetMusicInfo( &mi );
+		SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
+		//SetDlgItemInt(hDlgTrack,IDE_VIEWTRACK,0,TRUE );
+		SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
+		SetModified(false);//title name set
+        gFileUnsaved = false;
 		break;
-	case WM_PAINT://表示メッセージ
+	case WM_PAINT://display message
+	{
 		HDC hdc;
 		PAINTSTRUCT ps;
 
-		hdc = BeginPaint(hWnd,&ps);
+		hdc = BeginPaint(hWnd, &ps);
 		RefleshScreen(hdc);
+
 		//static TCHAR strSize[128];
 		//wsprintf(strSize , "width = %d : height = %d" , WWidth , WHeight);
-		TextOut(hdc , 10 , 10 , strSize , lstrlen(strSize));
-		EndPaint(hWnd,&ps);
+		TextOut(hdc, 10, 10, strSize, lstrlen(strSize));
+		EndPaint(hWnd, &ps);
 
 
 		break;
+	}
 	case WM_CLOSE:
 		//if(iChangeFinish!=0){	// A 2010.09.22
 		//	char cc[512],*chn;
 		//	GetWindowText(hWnd,cc,512);
 		//	chn = strstr(cc, HENKOU_NO_SHIRUSHI);
 		//	if(chn!=NULL){
-		//		//変更があったときは終了確認する。 // A 2010.09.22
-		//		if(MessageBox(hwnd,"保存していない内容は破棄されます。終了しますか？","終了確認",MB_OKCANCEL| MB_ICONASTERISK)==IDCANCEL)break;
+		//		//Confirm the end when there is a change.// A 2010.09.22
+		//		if(MessageBox(hwnd,"Any unsaved content will be discarded. Are you sure you want to quit?","end confirmation",MB_OKCANCEL| MB_ICONASTERISK)==IDCANCEL)break;
 		//	}
 		//}
 		if(CancelDeleteCurrentData(CDCD_EXIT))break;
@@ -1151,10 +1238,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
 	case WM_QUIT:
 		break;
-	case WM_DESTROY://後処理用
+	case WM_DESTROY://for post-processing
 		EndDirectSound();
 		org_data.ReleaseNote();
-		DeleteWaveData100(); //追加20140401 通常、WM_CLOSE → WM_DESTROY → WM_QUIT の順に呼ばれるらしい。
+		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE → WM_DESTROY → WM_QUIT.
 		EndGDI();
 		if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
 		if(!hDlgTrack)DestroyWindow(hDlgTrack);
@@ -1162,10 +1249,17 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		if(!hwnd)DestroyWindow(hwnd);
 		PostQuitMessage(0);
 		free(strMIDIFile); //2014.05.11
+		free(gSelectedTheme);
 		FreeMessageStringBuffer();	// 2014.10.19 
 		break;
-	case WM_KEYDOWN://キーボードが押された
+	case WM_KEYDOWN://keyboard pressed
 		switch(wParam){
+		case VK_PRIOR:
+			scr_data.VertScrollProc(SB_PAGEUP);
+			break;
+		case VK_NEXT:
+			scr_data.VertScrollProc(SB_PAGEDOWN);
+			break;
 		case VK_UP:
 			scr_data.KeyScroll(DIRECTION_UP);
 			break;
@@ -1211,7 +1305,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				iCurrentPhase=-iCurrentPhase + 1;
 				Rxo_PlayKey(iCast[wParam] + iPushShift[0]*12 -iPushShift[1]*12 , org_data.track, 1000, iKeyPhase[iCast[wParam]]);
 				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 1;
-				org_data.PutMusic();//楽譜の再描画
+				org_data.PutMusic();//Redrawing sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 			}
@@ -1229,7 +1323,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
 //				wsprintf(strSize , "U lParam = %x" , lParam);
 //				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-	case WM_KEYUP: //キーボードが離された
+	case WM_KEYUP: //keyboard released
 		switch(wParam){
 		case 'Z':
 		case 'S':
@@ -1254,7 +1348,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				Rxo_StopKey(iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12, org_data.track, iKeyPhase[iCast[wParam]]);
 				iKeyPhase[iCast[wParam]] = -1;
 				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 0;
-				org_data.PutMusic();//楽譜の再描画
+				org_data.PutMusic();//Redrawing sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 			}
 			break;
@@ -1262,7 +1356,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if((timer_sw==0 || iChangeEnablePlaying!=0)){
 				iPushShift[0]=0;
 				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				org_data.PutMusic();//楽譜の再描画
+				org_data.PutMusic();//Redrawing sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				Rxo_StopAllSoundNow();
 			}
@@ -1271,7 +1365,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if((timer_sw==0 || iChangeEnablePlaying!=0)){
 				iPushShift[1]=0;
 				for(i=0;i<256;i++)iKeyPushDown[i]=0;
-				org_data.PutMusic();//楽譜の再描画
+				org_data.PutMusic();//Redrawing sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				Rxo_StopAllSoundNow();
 			}
@@ -1279,22 +1373,22 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		break;
 
-    case WM_LBUTTONDOWN://マウス(左)が押された
+    case WM_LBUTTONDOWN://mouse (left) pressed
 		ClickProcL(wParam, lParam);
 		break;
-    case WM_RBUTTONDOWN://マウス(右)が押された
+    case WM_RBUTTONDOWN://mouse (right) pressed
 		ClickProcR(wParam, lParam);
 		break;
-    case WM_MBUTTONDOWN://マウス(中央)が押された
+    case WM_MBUTTONDOWN://mouse (middle) pressed
 		ClickProcM(wParam, lParam);
 		break;
 	case WM_MOUSEMOVE:
 		MouseDrag(wParam, lParam);
 		break;
-    case WM_LBUTTONUP://マウス(左)が離された
+    case WM_LBUTTONUP://mouse (left) released
 		LButtonUP(wParam, lParam);
 		break;
-    case WM_RBUTTONUP://マウス(右)が離された
+    case WM_RBUTTONUP://mouse (right) released
 		RButtonUP(wParam, lParam);
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		break;
@@ -1311,15 +1405,15 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			pmmi = (MINMAXINFO *)lParam;
 			if ( pmmi )
 			{
-				pmmi->ptMinTrackSize.x = 420;  // 最小幅
-				pmmi->ptMinTrackSize.y = 480;  // 最小高
-				//pmmi->ptMaxTrackSize.x = 1024; // 最大幅
-				//pmmi->ptMaxTrackSize.y = 768;  // 最大高
+				pmmi->ptMinTrackSize.x = 420;  // Minimum margin
+				pmmi->ptMinTrackSize.y = 480;  // minimum height
+				//pmmi->ptMaxTrackSize.x = 1024; // maximum size
+				//pmmi->ptMaxTrackSize.y = 768;  // maximum height
 			}
 		
 		break;
-	case 0x020C: //妙なボタン押下
-		//MessageBox(hWnd,"読み込みに失敗しました","Error(Load)",MB_OK);
+	case 0x020C: //weird button press
+		//MessageBox(hWnd,"Failed to read","Error(Load)",MB_OK);
 		switch HIWORD(wParam){
 		case 0x0001: //▼
 			ChangeTrackPlus(hDlgTrack , 1);
@@ -1330,7 +1424,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		break;
 	case WM_SIZE:
-		WWidth = LOWORD(lParam);	//クライアント領域のサイズ
+		WWidth = LOWORD(lParam);	//Client area size
 		WHeight = HIWORD(lParam);
 		rect.right = WWidth;		//A 2008/05/14
 		rect.bottom = WHeight;		//A 2008/05/14
@@ -1343,7 +1437,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 		break;
-	case WM_SIZING: //大きさを変更中
+	case WM_SIZING: //resizing
 		//org_data.PutBackGround();
 		//org_data.PutMusic();
 		
@@ -1351,7 +1445,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		
 		//AfterReSize = true;
 		break;
-	//以下はテスト用
+	//below is for testing
 /*	case WM_MOUSEMOVE:
 		char str[80];
 		long mouse_x,mouse_y;
@@ -1368,64 +1462,46 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 	return FALSE;
 }
-//タイトルバーにファイルネームを表示
-void SetTitlebarText(char *name)
+//Show filename in title bar
+void SetTitlebarText()
 {
-	int i,j;
-	char set_name[MAX_PATH+15];//タイトルに表示ｽﾍﾟｰｽ
-	char file_name[MAX_PATH];//名前を加工（ディレクトリを排除）
+	int i, j;
+	char set_name[MAX_PATH + 20];//display space in title
+	char file_name[MAX_PATH];//Manipulate names (exclude directories)
 
 	i = 0;
-	while(name[i] != NULL)i++;//まずは尻まで
-	while(i != 0 && name[i-1] != '\\')i--; //ラストの円マーク
-	
-	//ファイル名をつくる
+	while (music_file[i] != NULL) i++;//first up to the end
+	while (i != 0 && music_file[i - 1] != '\\') i--; //Last circle mark
+
+	//create file name
 	j = 0;
-	while(name[i] != NULL){
-		file_name[j] = name[i];
+	while (music_file[i] != NULL) {
+		file_name[j] = music_file[i];
 		i++;
 		j++;
 	}
 	file_name[j] = NULL;
-	//アプリタイトルを流し込み
-	for(i = 0; i < 15; i++){
-		set_name[i] = lpszName[i];
+	//put file name
+	for (i = 0; i < MAX_PATH; i++) {
+		if (file_name[i] == NULL)break;
+		set_name[i] = file_name[i];
 	}
-	//ファイル名を流し込み
-	for(j = 0; j < MAX_PATH; j++){
-		set_name[i] = file_name[j];
-		if(set_name[i] == NULL)break;
+	if (gFileModified) { // Lazy
+		set_name[i] = '*';
 		i++;
 	}
-	SetWindowText(hWnd,&set_name[0]);
+	//Insert app title
+	for (j = 0; j < 20; j++) {
+		set_name[i] = lpszName[j];
+		if (set_name[i] == NULL) break;
+		i++;
+	}
+	SetWindowText(hWnd, &set_name[0]);
 }
 
-
-//変更アリの印。
-void SetTitlebarChange(void)
-{
-	char cc[512],*chn;
-	GetWindowText(hWnd,cc,512);
-	//chn = strstr(cc, HENKOU_NO_SHIRUSHI);	// 2014.10.19 D
-	chn = strstr(cc, MessageString[IDS_MODIFIED]);	// 2014.10.19 A
-	if(chn==NULL){
-		//strcat(cc, HENKOU_NO_SHIRUSHI);	// 2014.10.19 D
-		strcat(cc, MessageString[IDS_MODIFIED]);	// 2014.10.19 A
-		SetWindowText(hWnd,cc);
-	}
-
-}
-void ResetTitlebarChange(void)
-{
-	char cc[512],*chn;
-	GetWindowText(hWnd,cc,512);
-	//chn = strstr(cc, HENKOU_NO_SHIRUSHI);	// 2014.10.19 D
-	chn = strstr(cc, MessageString[IDS_MODIFIED]);	// 2014.10.19 A
-	if(chn!=NULL){
-		*chn = '\0';//消す
-		*(chn+1) = '\0';//消す
-		SetWindowText(hWnd,cc);
-	}
+void SetModified(bool mod) {
+	gFileModified = mod;
+	SetTitlebarText();
 }
 
 void SaveIniFile()
@@ -1435,7 +1511,7 @@ void SaveIniFile()
 	WPM.length = sizeof(WINDOWPLACEMENT);
 	GetWindowPlacement(hWnd, &WPM);
 	if(WPM.showCmd == SW_SHOWMAXIMIZED)i=1;else i=0;
-	ShowWindow( hWnd, SW_RESTORE );	//元のサイズニ
+	ShowWindow( hWnd, SW_RESTORE );	//original size
 
 	GetWindowRect(hWnd,(LPRECT)&WinRect);
 	wsprintf(num_buf,"%d",WinRect.left);
@@ -1468,6 +1544,12 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW,"NoteWidth",num_buf,app_path);
 	wsprintf(num_buf,"%d",NoteEnlarge_Until_16px);
 	WritePrivateProfileString(MAIN_WINDOW,"NoteEnlarge",num_buf,app_path);
+	wsprintf(num_buf,"%d",sMetronome);
+	WritePrivateProfileString(MAIN_WINDOW,"Metronome",num_buf,app_path);
+	wsprintf(num_buf, "%d", sSmoothScroll);
+	WritePrivateProfileString(MAIN_WINDOW, "SmoothScroll", num_buf, app_path);
+
+	WritePrivateProfileString(MAIN_WINDOW, "CurrentThemePath", gSelectedTheme, app_path);
 
 
 	GetWindowRect(hDlgTrack,(LPRECT)&WinRect);
@@ -1512,7 +1594,7 @@ void SaveIniFile()
 }
 
 /*
-//オープニングフラッシュ
+//opening flash
 BOOL CALLBACK DialogFlash(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message){
@@ -1524,10 +1606,10 @@ BOOL CALLBACK DialogFlash(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		long my_h;
 		long x,y,w,h;
 
-		//スクリーンサイズ
+		//screen size
 		screen_w = GetSystemMetrics(SM_CXSCREEN);
 		screen_h = GetSystemMetrics(SM_CYSCREEN);
-		//ウインドウサイズ
+		//window size
 		my_w = gWidthWindow;
 		my_h = gHeightWindow;
 

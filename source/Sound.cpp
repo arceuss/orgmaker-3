@@ -41,7 +41,7 @@ BOOL InitDirectSound(HWND hwnd)
 		lpDS = NULL;
 		return(FALSE);
 	}
-    lpDS->SetCooperativeLevel(hwnd, DSSCL_EXCLUSIVE);
+    lpDS->SetCooperativeLevel(hwnd, DSSCL_PRIORITY);
 
     // 一次バッファの初期化
     ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
@@ -113,7 +113,7 @@ BOOL InitSoundObject( LPCSTR resname, int no)
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
 	dsbd.dwFlags = 
 		DSBCAPS_STATIC|
-		DSBCAPS_STICKYFOCUS
+		DSBCAPS_GLOBALFOCUS
 		|DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)lpdword+0x36);//WAVEデータのサイズ
 	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(lpdword+5); 
@@ -168,7 +168,7 @@ BOOL LoadSoundObject(char *file_name, int no)
 	DSBUFFERDESC dsbd;
 	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
-	dsbd.dwFlags = DSBCAPS_STATIC|DSBCAPS_STICKYFOCUS|DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
+	dsbd.dwFlags = DSBCAPS_STATIC|DSBCAPS_GLOBALFOCUS|DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)wp+0x36);//WAVEデータのサイズ
 	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(wp+5); 
 	if(lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no],
@@ -274,7 +274,7 @@ BOOL MakeSoundObject8(char *wavep,char track, char pipi )
 			ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
 			dsbd.dwSize = sizeof(DSBUFFERDESC);
 			dsbd.dwFlags = DSBCAPS_STATIC|
-					DSBCAPS_STICKYFOCUS|
+					DSBCAPS_GLOBALFOCUS|
 					DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;//DSBCAPS_STATIC|DSBCAPS_CTRLDEFAULT;
 			dsbd.dwBufferBytes = data_size;//file_size;
 			dsbd.lpwfxFormat = (LPWAVEFORMATEX)(&format_tbl2[0]);
@@ -526,7 +526,7 @@ BOOL InitDramObject( LPCSTR resname, int no)
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
 	dsbd.dwFlags = 
 		DSBCAPS_STATIC|
-		DSBCAPS_STICKYFOCUS
+		DSBCAPS_GLOBALFOCUS
 		|DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)lpdword+0x36);//WAVEデータのサイズ
 	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(lpdword+5); 
@@ -588,7 +588,7 @@ BOOL LoadDramObject(char *file_name, int no)
 	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
 	dsbd.dwFlags = DSBCAPS_STATIC|
-		DSBCAPS_STICKYFOCUS
+		DSBCAPS_GLOBALFOCUS
 		|DSBCAPS_CTRLDEFAULT;
 	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)wp+0x36);//WAVEデータのサイズ
 	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(wp+5); 

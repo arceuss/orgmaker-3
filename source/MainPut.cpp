@@ -206,32 +206,50 @@ extern int iKeyPushDown[256]; // 2010.09.22 A ピアノキーの押され具合
 //キーボードとピアノロールの位置
 void OrgData::PutNumber(void)
 {
+	MUSICINFO mi;
 	long scr_h,scr_v;
+	long scalepos;
+	int off, x;
 	char k100,k10,k1;
 	char i,j;
 	char k = info.dot*info.line;
-	j = (WWidth/NoteWidth)/k;
+	GetMusicInfo(&mi);
+	scr_data.GetScrollPosition(&scr_h, &scr_v);
+	j = (WWidth/NoteWidth)/k + (scr_h % k != 0 ? 1 : 0);
 	//小節を表示
 	for(i = 0; i <= j; i++){
-		scr_data.GetScrollPosition(&scr_h,&scr_v);
-		scr_h += i;
+		scalepos = scr_h / (mi.dot * mi.line);
+		scalepos += i;
 		k100 = k10 = k1 = 0;
-		while(scr_h >= 100){
+		while(scalepos >= 100){
 			k100++;
-			scr_h -= 100;
+			scalepos -= 100;
 		}
-		while(scr_h >= 10){
+		while(scalepos >= 10){
 			k10++;
-			scr_h -= 10;
+			scalepos -= 10;
 		}
 		
-		PutBitmap(k*i*NoteWidth+0 +KEYWIDTH+1,0,&num_rect[k100],BMPNUMBER);
-		PutBitmap(k*i*NoteWidth+8 +KEYWIDTH+1,0,&num_rect[k10],BMPNUMBER);
-		PutBitmap(k*i*NoteWidth+16+KEYWIDTH+1,0,&num_rect[scr_h],BMPNUMBER);
+		off = (-(scr_h % (info.dot * info.line)) * NoteWidth);
+		x = k * i * NoteWidth + 0 + KEYWIDTH + 1 + off;
+		if (x >= KEYWIDTH)
+			PutBitmap(x,0,&num_rect[k100],BMPNUMBER);
+		x = k * i * NoteWidth + 8 + KEYWIDTH + 1 + off;
+		if (x >= KEYWIDTH)
+			PutBitmap(x,0,&num_rect[k10],BMPNUMBER);
+		x = k * i * NoteWidth + 16 + KEYWIDTH + 1 + off;
+		if (x >= KEYWIDTH)
+			PutBitmap(x,0,&num_rect[scalepos],BMPNUMBER);
 		if(WHeight>550){
-			PutBitmap(k*i*NoteWidth+0 +KEYWIDTH+1,WHeight+288-WHNM-12,&num_rect[k100],BMPNUMBER);
-			PutBitmap(k*i*NoteWidth+8 +KEYWIDTH+1,WHeight+288-WHNM-12,&num_rect[k10],BMPNUMBER);
-			PutBitmap(k*i*NoteWidth+16+KEYWIDTH+1,WHeight+288-WHNM-12,&num_rect[scr_h],BMPNUMBER);
+			x = k * i * NoteWidth + 0 + KEYWIDTH + 1 + off;
+			if (x >= KEYWIDTH)
+				PutBitmap(x,WHeight+288-WHNM-12,&num_rect[k100],BMPNUMBER);
+			x = k * i * NoteWidth + 8 + KEYWIDTH + 1 + off;
+			if (x >= KEYWIDTH)
+				PutBitmap(x,WHeight+288-WHNM-12,&num_rect[k10],BMPNUMBER);
+			x = k * i * NoteWidth + 16 + KEYWIDTH + 1 + off;
+			if (x >= KEYWIDTH)
+				PutBitmap(x,WHeight+288-WHNM-12,&num_rect[scalepos],BMPNUMBER);
 		}
 	}
 	//キーを表示
@@ -244,10 +262,12 @@ void OrgData::PutRepeat(void)
 	long scr_h,scr_v;
 	long x;
 	scr_data.GetScrollPosition(&scr_h,&scr_v);
-	x = (info.repeat_x - scr_h*info.dot*info.line)*NoteWidth + 64;
-	PutBitmap(x,WHeight+276-WHNM-12,&note_rect[5],BMPNOTE);
-	x = (info.end_x - scr_h*info.dot*info.line)*NoteWidth + 64;
-	PutBitmap(x,WHeight+276-WHNM-12,&note_rect[6],BMPNOTE);
+	x = (info.repeat_x - scr_h)*NoteWidth + KEYWIDTH;
+	if (x >= KEYWIDTH)
+		PutBitmap(x, WHeight + 276 - WHNM - (WHeight > 550 ? 12 : 0), &note_rect[5], BMPNOTE);
+	x = (info.end_x - scr_h)*NoteWidth + KEYWIDTH;
+	if (x >= KEYWIDTH)
+		PutBitmap(x,WHeight+276-WHNM-(WHeight > 550 ? 12 : 0),&note_rect[6],BMPNOTE);
 }
 
 //音符の表示
@@ -313,7 +333,7 @@ void OrgData::PutNotes(int TPCY)
 		if(k == track)continue;
 		if((p = info.tdata[k].note_list) == NULL)continue;//音符が無ければ中止
 		while(p != NULL && p->to != NULL){//どこから表示するか
-			xpos = (p->x - line*dot*scr_h)*NoteWidth + KEYWIDTH;
+			xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 			if(xpos >= KEYWIDTH)break;//表示領域に入った
 			p = p->to;
 		}
@@ -324,7 +344,7 @@ void OrgData::PutNotes(int TPCY)
 		//音符ががなくなるか、X座標が表示領域を超えるまで表示。
 		while(p != NULL){
 			ypos = (95 - p->y - scr_v)*12;//下が0になる95が最大
-			xpos = (p->x - line*dot*scr_h)*NoteWidth + KEYWIDTH;
+			xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 			t = (p->y % 12); if(t==1 || t==3 || t==6 || t==8 || t==10)t=1;else t=0;
 			if(xpos > WWidth)break;//表示領域を超えた。
 			if(ypos >= 0 && ypos < WHeight+286-WHNM){//表示範囲YPOS
@@ -361,7 +381,7 @@ void OrgData::PutNotes(int TPCY)
 		//return;//音符が無ければ中止
 	}else{
 		while(p != NULL && p->to != NULL){//どこから表示するか
-			xpos = (p->x - line*dot*scr_h)*NoteWidth + KEYWIDTH;
+			xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 			if(xpos >= KEYWIDTH)break;
 			p = p->to;
 		}
@@ -374,7 +394,7 @@ void OrgData::PutNotes(int TPCY)
 			//音符ががなくなるか、X座標が表示領域を超えるまで表示。
 			while(p != NULL){
 				ypos = (95 - p->y - scr_v)*12;//下が0になる95が最大
-				xpos = (p->x - line*dot*scr_h)*NoteWidth + KEYWIDTH;
+				xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 				if(xpos > WWidth)break;//表示領域を超えた。
 				if(ypos >= 0 && ypos < WHeight+286-WHNM){//表示範囲YPOS
 					//tBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
@@ -423,7 +443,7 @@ void OrgData::PutNotes2(int TPCY)
 			continue;//音符が無ければ中止
 		}
 		while(p != NULL && p->to != NULL){//どこから表示するか
-			xpos = (p->x - line*dot*scr_h)*NoteWidth + KEYWIDTH;
+			xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 			if(xpos >= KEYWIDTH)break;
 			p = p->to;
 		}
@@ -434,7 +454,7 @@ void OrgData::PutNotes2(int TPCY)
 		//音符ががなくなるか、X座標が表示領域を超えるまで表示。
 		while(p != NULL){
 			ypos = (95 - p->y - scr_v)*12;//下が0になる95が最大
-			xpos = (p->x - line*dot*scr_h)*NoteWidth + KEYWIDTH;
+			xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 			t = (p->y % 12); if(t==1 || t==3 || t==6 || t==8 || t==10)t=1;else t=0;
 			if(xpos > WWidth)break;//表示領域を超えた。
 //			if(ypos >= 0 && ypos < 286+WDWHEIGHTPLUS){//表示範囲YPOS
@@ -459,7 +479,7 @@ void OrgData::PutNotes2(int TPCY)
 		//return;//音符が無ければ中止
 	}else{
 		while(p != NULL && p->to != NULL){//どこから表示するか
-			xpos = (p->x - line*dot*scr_h)*16 + KEYWIDTH;
+			xpos = (p->x - scr_h)*16 + KEYWIDTH;
 			if(xpos >= KEYWIDTH)break;
 			p = p->to;
 		}
@@ -472,7 +492,7 @@ void OrgData::PutNotes2(int TPCY)
 			//音符ががなくなるか、X座標が表示領域を超えるまで表示。
 			while(p != NULL){
 				ypos = (95 - p->y - scr_v)*12;//下が0になる95が最大
-				xpos = (p->x - line*dot*scr_h)*NoteWidth + KEYWIDTH;
+				xpos = (p->x - scr_h)*NoteWidth + KEYWIDTH;
 				if(xpos > WWidth)break;//表示領域を超えた。
 				if(ypos >= 0 && ypos < WHeight+286-WHNM){//表示範囲YPOS
 					//PutBitmap(xpos,ypos+2,&note_rect[0],BMPNOTE);//音符
@@ -500,15 +520,30 @@ void OrgData::PutNotes2(int TPCY)
 //楽譜の表示
 void OrgData::PutMusic(void)
 {
+	if (gIsDrawing) return;
+	gIsDrawing = true;
+
+	RECT brect;
 	int j;
 	int i; // A 2010.09.24
+	long x;
 	long hpos,vpos,vpos2;
+
+	brect = {0, 0, WWidth, WHeight};
+	PutRect(&brect, 0);
+
 	scr_data.GetScrollPosition(&hpos,&vpos);
 	vpos2=vpos;
 	vpos = -(vpos%12)*12;
 	//ここ以降に楽譜表示を記述
-	for(j = 0; j < 8; j++)PutMusicParts(64,j*144 +vpos);//楽譜
-	PutPanParts();//パンライン
+	x = (-(hpos % (info.dot * info.line)) * NoteWidth) + KEYWIDTH;
+
+	for (j = 0; j < 8; j++)PutMusicParts(x, j * 144 + vpos);//楽譜
+	PutPanParts(x);//パンライン
+	/*if (x < KEYWIDTH) {
+		for (j = 0; j < 8; j++)PutMusicParts(x + WWidth, j * 144 + vpos);//楽譜
+		PutPanParts(x + WWidth);//パンライン
+	}*/
 
 	//キーボード鍵盤（譜面背景を光らす部分）
 	for(j = 0; j < 96 ; j++){ // 2010.09.22 A
@@ -560,6 +595,7 @@ void OrgData::PutMusic(void)
 	if(iActivateVOL){ //2014.05.01
 		PutBitmap(0,WHeight+288-WHNM+72,&rc_ActiveVOL, BMPNOTE);
 	}
+	gIsDrawing = false;
 }
 
 //選択範囲の表示
@@ -576,8 +612,8 @@ void OrgData::PutSelectArea()
 
 	int xSelS, xSelE,xx,t;
 	t = 0; if(ful==0 && tra!=track)t=3;
-	xSelS = (nc_Select.x1_1 - line*dot*scr_h)*NoteWidth + KEYWIDTH; //選択開始点
-	xSelE = (nc_Select.x1_2 - line*dot*scr_h)*NoteWidth + KEYWIDTH; //選択終了点
+	xSelS = (nc_Select.x1_1 - scr_h)*NoteWidth + KEYWIDTH; //選択開始点
+	xSelE = (nc_Select.x1_2 - scr_h)*NoteWidth + KEYWIDTH; //選択終了点
 	ypos = WHeight - 13;
 	for(xx=KEYWIDTH;xx<=WWidth+NoteWidth;xx+=NoteWidth){
 		if(xx==xSelS){
@@ -599,7 +635,11 @@ void OrgData::PutSelectArea()
 
 void OrgData::RedrawSelectArea()
 {
-	PutSelectParts();//パンライン
+	long x;
+	long hpos, vpos;
+	scr_data.GetScrollPosition(&hpos, &vpos);
+	x = (-(hpos % (info.dot * info.line)) * NoteWidth) + KEYWIDTH;
+	PutSelectParts(x);//パンライン
 	PutSelectArea();
 
 }

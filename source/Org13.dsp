@@ -557,6 +557,14 @@ SOURCE=.\Wave\Tom05.wav
 # End Source File
 # Begin Source File
 
+SOURCE=.\Wave\Metro01.wav
+# End Source File
+# Begin Source File
+
+SOURCE=.\Wave\Metro02.wav
+# End Source File
+# Begin Source File
+
 SOURCE=.\Wave\Wave.dat
 # End Source File
 # End Target

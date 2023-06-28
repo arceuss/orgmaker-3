@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "Setting.h"
 #include "DefOrg.h"
 #include "resource.h"
@@ -9,6 +11,7 @@
 char timer_sw = 0;
 extern HWND hDlgTrack;
 extern HWND hWnd;
+extern char* gSelectedTheme;
 
 int mute_name[MAXTRACK] = {
 	IDC_MUTE0,
@@ -28,6 +31,16 @@ int mute_name[MAXTRACK] = {
 	IDC_MUTE14,
 	IDC_MUTE15,
 };
+
+void LoadPlayerBitmaps(HWND hdwnd) {
+	LoadSingleBitmap(hdwnd, IDC_START, 24, 24, "B_HEAD");
+	LoadSingleBitmap(hdwnd, IDC_PLAY, 40, 24, "B_PLAY");
+	LoadSingleBitmap(hdwnd, IDC_STOP, 40, 24, "B_STOP");
+	LoadSingleBitmap(hdwnd, IDC_LEFT, 24, 24, "B_LEFT");
+	LoadSingleBitmap(hdwnd, IDC_RIGHT, 24, 24, "B_RIGHT");
+	LoadSingleBitmap(hdwnd, IDC_LEFTSTEP, 24, 24, "B_LEFTSTEP");
+	LoadSingleBitmap(hdwnd, IDC_RIGHTSTEP, 24, 24, "B_RIGHTSTEP");
+}
 //簡単なダイアログ関数
 BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam){
 	int i;
@@ -39,7 +52,6 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 	char str[32];
 	switch(message){
 	case WM_INITDIALOG://ダイアログが呼ばれた
-		HANDLE hBmp;
 		org_data.GetMusicInfo(&mi);
 		itoa(mi.wait,str,10);
 		SetDlgItemText(hdwnd,IDE_VIEWWAIT,str);
@@ -71,16 +83,7 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 		hBmp = (HBITMAP)LoadImage( hInst, "RIGHT", IMAGE_BITMAP, 32, 16, LR_DEFAULTCOLOR );
 		SendDlgItemMessage( hdwnd, IDC_RIGHT, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
 */
-		hBmp = (HBITMAP)LoadImage( hInst, "B_HEAD", IMAGE_BITMAP, 24, 24, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_START, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-		hBmp = (HBITMAP)LoadImage( hInst, "B_PLAY", IMAGE_BITMAP, 40, 24, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_PLAY, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-		hBmp = (HBITMAP)LoadImage( hInst, "B_STOP", IMAGE_BITMAP, 40, 24, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_STOP, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-		hBmp = (HBITMAP)LoadImage( hInst, "B_LEFT", IMAGE_BITMAP, 24, 24, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_LEFT, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
-		hBmp = (HBITMAP)LoadImage( hInst, "B_RIGHT", IMAGE_BITMAP, 24, 24, LR_DEFAULTCOLOR );
-		SendDlgItemMessage( hdwnd, IDC_RIGHT, BM_SETIMAGE, IMAGE_BITMAP, (long)hBmp );
+		LoadPlayerBitmaps(hdwnd);
 		return 1;
 	case WM_MOUSEMOVE:
 		if(wParam & MK_LBUTTON){
@@ -116,8 +119,7 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				}
 				//プレイポインターの設定
 				scr_data.GetScrollPosition(&hp,&vp);
-				org_data.GetMusicInfo(&mi);
-				org_data.SetPlayPointer(hp*mi.dot*mi.line);
+				org_data.SetPlayPointer(hp);
 				timer_sw = 1;
 				InitMMTimer();
 				//テンポを取得
@@ -188,11 +190,19 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 			}
 			return 1;
 		case IDC_LEFT:
-			scr_data.HorzScrollProc( SB_LINELEFT );
+			scr_data.HorzScrollProc(SB_PAGELEFT);
 			SetFocus(hWnd);
 			return 1;
 		case IDC_RIGHT:
-			scr_data.HorzScrollProc( SB_LINERIGHT );
+			scr_data.HorzScrollProc(SB_PAGERIGHT);
+			SetFocus(hWnd);
+			return 1;
+		case IDC_LEFTSTEP:
+			scr_data.HorzScrollProc(SB_LINELEFT);
+			SetFocus(hWnd);
+			return 1;
+		case IDC_RIGHTSTEP:
+			scr_data.HorzScrollProc(SB_LINERIGHT);
 			SetFocus(hWnd);
 			return 1;
 		}

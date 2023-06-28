@@ -8,7 +8,10 @@
 long play_p;//現在再生位置（キャンバス）
 NOTELIST *np[MAXTRACK];//現在再生準備の音符
 long now_leng[MAXMELODY] = {NULL};//再生中音符の長さ
+DWORD lastDrawTime = -1;
 extern HWND hDlgPlayer;
+extern int sMetronome;
+extern int sSmoothScroll;
 void OrgData::PlayData(void)
 {
 	char str[10];
@@ -39,7 +42,7 @@ void OrgData::PlayData(void)
 		if(now_leng[i] > 0)now_leng[i]--;
 	}
 	//ドラムの再生
-	for(i = MAXMELODY; i < MAXTRACK; i++){
+	for(int i = MAXMELODY; i < MAXTRACK; i++){
 		if(np[i] != NULL &&play_p == np[i]->x ){//音が来た。
 			if(np[i]->y != KEYDUMMY){//ならす
 				if(mute[i] == 0)PlayDramObject(np[i]->y,1,i-MAXMELODY);
@@ -58,9 +61,26 @@ void OrgData::PlayData(void)
 	GetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,oldstr,10);
 	if(strcmp(str, oldstr) != 0)SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);
 	//自動スクロール
-	if(actApp){//アクティブの時だけ
-		if(play_p%(info.dot*info.line) == 0 && play_p+1 != info.end_x )
-			scr_data.SetHorzScroll(play_p/(info.dot*info.line));
+	/*if(actApp){//アクティブの時だけ
+		
+	}*/
+	if (sSmoothScroll || (play_p % (info.dot * info.line) == 0 && play_p + 1 != info.end_x)) {
+		DWORD dwNowTime;
+		dwNowTime = timeGetTime();
+		// Only draw if 8 ms have passed, to prevent lags
+		if (dwNowTime - lastDrawTime >= 8) { // 125 fps
+			if (play_p != info.end_x) scr_data.SetHorzScroll(play_p);
+			else scr_data.SetHorzScroll(info.repeat_x);
+			lastDrawTime = dwNowTime;
+		}
+	}
+	if (sMetronome && info.wait >= 8) { // So it wont play sound too fast
+		if (play_p % (info.line * info.dot) == 0) {
+			PlaySound("METRO01", GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+		}
+		else if (play_p % info.dot == 0) {
+			PlaySound("METRO02", GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+		}
 	}
 	play_p++;
 	if(play_p >= info.end_x){
@@ -77,4 +97,7 @@ void OrgData::SetPlayPointer(long x)
 		while(np[i] != NULL && np[i]->x < x)np[i] = np[i]->to;//見るべき音符を設定		
 	}
 	play_p = x;
+}
+void OrgData::GetPlayPos(long* playpos) {
+	*playpos = play_p;
 }

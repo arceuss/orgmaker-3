@@ -38,9 +38,9 @@ typedef struct{
 //曲単位で持つ固有の情報
 typedef struct MUSICINFO{
 	unsigned short wait;
-	unsigned char line;//１小節のライン数
-	unsigned char dot;//一泊のドット数
-	unsigned short alloc_note;//確保した音符の数
+	unsigned char line;//Number of lines in one bar
+	unsigned char dot;//Number of dots per night
+	unsigned short alloc_note;//number of reserved notes
 	long repeat_x;//リピート
 	long end_x;//曲の終わり(リピートに戻る)
 	TRACKDATA tdata[16];
@@ -112,6 +112,7 @@ typedef struct OrgData{
 		//以下は再生
 		void PlayData(void);
 		void SetPlayPointer(long x);//再生ポインターを指定の位置に設定
+		void GetPlayPos(long *playpos);
 		//以下はファイル関係
 		unsigned short GetNoteNumber(char track,NOTECOPY *nc);
 		BOOL OrgData::SaveMusicData(void);

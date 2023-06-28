@@ -6,8 +6,8 @@
 
 typedef struct ScrollData{
 	private:
-		long hpos;//横スクロール値
-		long vpos;//縦スクロール値
+		long hpos;//Horizontal scroll value
+		long vpos;//Vertical scroll value
 		SCROLLINFO scr_info;
 		long vScrollMax;
 	public:
@@ -22,5 +22,7 @@ typedef struct ScrollData{
 		void KeyScroll(int iDirection); //キー操作によるスクロール用
 		void PrintHorzPosition(void);
 		void ChangeVerticalRange(int WindowHeight = -1); //ウィンドウサイズに応じてスクロールバーRangeを変更
+		void ChangeHorizontalRange(int range); //ウィンドウサイズに応じてスクロールバーRangeを変更
 }SCROLLDATA;
 extern SCROLLDATA scr_data;//スクロールデータ
+extern long MAXHORZRANGE;

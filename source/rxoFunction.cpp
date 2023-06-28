@@ -38,8 +38,7 @@
 MEMORYSTATUS rMem ;
 //GlobalMemoryStatus( &Mem ) ;
 
-extern void SetTitlebarChange(void);
-extern void ResetTitlebarChange(void);
+extern void SetModified(bool mod);
 
 extern HWND hDlgTrack;
 extern int mute_name[MAXTRACK];
@@ -51,7 +50,9 @@ extern int sACrnt;	//範囲選択は常にｶﾚﾝﾄﾄﾗｯｸ
 extern int gDrawDouble;	//両方のトラックグループを描画する
 extern CHAR app_path[];
 extern int iDragMode;
-extern SaveWithInitVolFile;
+extern int SaveWithInitVolFile;
+extern int sMetronome;
+extern int sSmoothScroll;
 
 TCHAR *MessageStringBuffer = NULL;	// 2014.10.19 A
 TCHAR *MessageString[MESSAGE_STRING_MAX];
@@ -177,9 +178,9 @@ void SetMenuRecent(int iMenuNumber, char *strText, int iDisable)
 	HMENU hMenu;
 	hMenu=GetMenu(hWnd);
 	char strCc[256];
-	strcpy(strCc,"&&");
-	itoa((iMenuNumber+1)%10, &strCc[1], 10);
-	strCc[2]='\0';
+	strcpy(strCc,"  &&");
+	itoa((iMenuNumber+1)%10, &strCc[3], 10);
+	strCc[4]='\0';
 	strcat(strCc," ");
 	//strcat(strCc,strText);
 	int y,i;
@@ -187,7 +188,7 @@ void SetMenuRecent(int iMenuNumber, char *strText, int iDisable)
 	for(i=y;i>0;i--)if(strText[i]=='\\'){i++;break;}
 	strcat(strCc,&strText[i]);
 	if(iMenuNumber==0){
-		strcat(strCc,"\tShift+Ctrl+Home");
+		strcat(strCc,"\tCtrl+Shift+Home");
 	}
 	ModifyMenu(hMenu, Menu_Recent[iMenuNumber], MF_BYCOMMAND|MF_STRING, Menu_Recent[iMenuNumber], strCc);
 	if(iDisable){
@@ -583,9 +584,9 @@ void ReplaseUndo()
 	EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_ENABLED);
 	DrawMenuBar(hWnd);//メニューを再描画
 	if(org_data.MinimumUndoCursor==0 && org_data.CurrentUndoCursor==0){
-		ResetTitlebarChange();
+		SetModified(false);
 	}else{
-		SetTitlebarChange();
+		SetModified(true);
 	}
 }
 
@@ -599,7 +600,7 @@ void SetUndo()
 		EnableMenuItem(hMenu,IDM_REDO,MF_BYCOMMAND|MF_GRAYED);
 		DrawMenuBar(hWnd);//メニューを再描画
 	}
-	SetTitlebarChange();
+	SetModified(true);
 }
 
 void ResetLastUndo() //取りけし
@@ -656,6 +657,36 @@ void ChangeGridMode(int iValue)
 		CheckMenuItem(hMenu,IDM_GRIDMODE,(MF_BYCOMMAND|MFS_UNCHECKED));
 	else
 		CheckMenuItem(hMenu,IDM_GRIDMODE,(MF_BYCOMMAND|MFS_CHECKED));
+	ShowStatusMessage();
+}
+
+void ChangeMetronomeMode(int iValue)
+{
+	HMENU hMenu;
+	hMenu = GetMenu(hWnd);
+	if (iValue != -1)sMetronome = iValue;
+	else {
+		sMetronome = 1 - sMetronome;
+	}
+	if (sMetronome == 0)
+		CheckMenuItem(hMenu, IDM_METRONOME, (MF_BYCOMMAND | MFS_UNCHECKED));
+	else
+		CheckMenuItem(hMenu, IDM_METRONOME, (MF_BYCOMMAND | MFS_CHECKED));
+	ShowStatusMessage();
+}
+
+void ChangeScrollMode(int iValue)
+{
+	HMENU hMenu;
+	hMenu = GetMenu(hWnd);
+	if (iValue != -1)sSmoothScroll = iValue;
+	else {
+		sSmoothScroll = 1 - sSmoothScroll;
+	}
+	if (sSmoothScroll == 0)
+		CheckMenuItem(hMenu, IDM_SMOOTHSCROLL, (MF_BYCOMMAND | MFS_UNCHECKED));
+	else
+		CheckMenuItem(hMenu, IDM_SMOOTHSCROLL, (MF_BYCOMMAND | MFS_CHECKED));
 	ShowStatusMessage();
 }
 

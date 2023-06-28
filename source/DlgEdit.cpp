@@ -569,6 +569,7 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	char str[128] = {NULL};
 //	long a,b,c,d;
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域
+	MUSICINFO mi;
 	NOTECOPY nc;
 	switch(message){
 	case WM_INITDIALOG://ダイアログが呼ばれた
@@ -604,6 +605,10 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			SetUndo();
 			org_data.SwapTrack(&nc);
+
+			org_data.GetMusicInfo(&mi);
+			MakeOrganyaWave(nc.track1, mi.tdata[nc.track1].wave_no, mi.tdata[nc.track1].pipi);
+			MakeOrganyaWave(nc.track2, mi.tdata[nc.track2].wave_no, mi.tdata[nc.track2].pipi);
 			//表示
 			org_data.PutMusic();
 			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);

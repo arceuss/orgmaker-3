@@ -91,7 +91,7 @@ void EZ_Delete()
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 	//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
-	nc_Select.x2 = scr_h* mi.dot * mi.line; //ここにコピー
+	nc_Select.x2 = scr_h; //ここにコピー
 	nc_Select.num = 1;
 	int t;
 	if(ful==1){
@@ -123,7 +123,7 @@ void EZ_Delete()
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
 	org_data.PutMusic();
 	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-	lash = scr_h + haba;
+	lash = scr_h / (mi.dot * mi.line) + haba;
 	wsprintf(mss,MessageString[IDS_STRING68]);//"　消去しました。"
 
 
@@ -146,7 +146,7 @@ void EZ_DeleteAndTrim()
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域(トラック変更)
 	org_data.GetMusicInfo(&mi);
 	//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
-	delNC.x2 = scr_h* mi.dot * mi.line; //ここにコピー
+	delNC.x2 = scr_h; //ここにコピー
 	if(tra<0){
 		wsprintf(CpHelp,MessageString[IDS_STRING69]); //"範囲が指定されていないので 画面左端から 1ドットを"
 		//wsprintf(CpHelp,"範囲が指定されていない。");
@@ -155,7 +155,7 @@ void EZ_DeleteAndTrim()
 		tmptra = org_data.track;
 		tmpful = 1;
 		tmpsACrnt = sACrnt;
-		delNC.x1_1 = scr_h* mi.dot * mi.line;
+		delNC.x1_1 = scr_h;
 		//delNC.x1_2 = delNC.x1_1 + mi.dot - 1;	// 2014.05.31 D
 		delNC.x1_2 = delNC.x1_1 ;	// 2014.05.31 A
 		
@@ -213,7 +213,7 @@ void EZ_DeleteAndTrim()
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
 	org_data.PutMusic();
 	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-	lash = scr_h + haba;
+	lash = scr_h / (mi.dot * mi.line) + haba;
 	wsprintf(mss,MessageString[IDS_STRING70]); //"　消去し、詰めました。"
 
 	strcpy(mks,CpHelp);
@@ -235,7 +235,7 @@ void EZ_Insert()
 	RECT rect = {64,0,WWidth,WHeight};//更新する領域(トラック変更)
 	org_data.GetMusicInfo(&mi);
 	//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
-	delNC.x2 = scr_h* mi.dot * mi.line; //ここにコピー
+	delNC.x2 = scr_h; //ここにコピー
 	if(tra<0){
 		wsprintf(CpHelp,MessageString[IDS_STRING69]); //"範囲が指定されていないので 画面左端から 1ドットを"
 		//wsprintf(CpHelp,"範囲が指定されていない。");
@@ -244,7 +244,7 @@ void EZ_Insert()
 		tmptra = org_data.track;
 		tmpful = 1;
 		tmpsACrnt = sACrnt;
-		delNC.x1_1 = scr_h* mi.dot * mi.line;
+		delNC.x1_1 = scr_h;
 		//delNC.x1_2 = delNC.x1_1 + mi.dot - 1;	// 2014.05.31 D
 		delNC.x1_2 = delNC.x1_1 ;	// 2014.05.31 A
 	}else{
@@ -301,7 +301,7 @@ void EZ_Insert()
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
 	org_data.PutMusic();
 	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-	lash = scr_h + haba;
+	lash = scr_h / (mi.dot * mi.line) + haba;
 	wsprintf(mss,MessageString[IDS_STRING71]);//"　後ろにずらしました。"
 
 	strcpy(mks,CpHelp);
@@ -329,7 +329,7 @@ void EZ_Paste(int iNum)
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 	//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
-	nc_Select.x2 = scr_h* mi.dot * mi.line; //ここにコピー
+	nc_Select.x2 = scr_h; //ここにコピー
 	nc_Select.num = iNum;
 	int t;
 	if(ful==1){
@@ -359,11 +359,11 @@ void EZ_Paste(int iNum)
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);
 	org_data.PutMusic();
 	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-	lash = scr_h + haba;
+	lash = scr_h / (mi.dot * mi.line) + haba;
 	//if(ful==1)wsprintf(mss,"　%d小節～%d小節に%d回コピーしました。",scr_h,lash,nc_Select.num);	// 2014.10.19 D
-	if(ful==1)wsprintf(mss,MessageString[IDS_STRING72],scr_h,lash,nc_Select.num);	// 2014.10.19 A
+	if(ful==1)wsprintf(mss,MessageString[IDS_STRING72],scr_h / (mi.dot * mi.line),lash,nc_Select.num);	// 2014.10.19 A
 	//else wsprintf(mss,"　トラック%c の%d小節～%d小節に%d回コピーしました。",TrackN[nc_Select.track2],scr_h,lash,nc_Select.num);	// 2014.10.19 D
-	else wsprintf(mss,MessageString[IDS_STRING73],TrackN[nc_Select.track2],scr_h,lash,nc_Select.num);	// 2014.10.19 A
+	else wsprintf(mss,MessageString[IDS_STRING73],TrackN[nc_Select.track2],scr_h / (mi.dot * mi.line),lash,nc_Select.num);	// 2014.10.19 A
 
 	strcpy(mks,CpHelp);
 	strcat(mks,mss);
@@ -410,7 +410,7 @@ BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				scr_data.GetScrollPosition(&scr_h,&scr_v);
 				//GetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str,4);//範囲from
 				//b = atol(str);
-				b = scr_h;
+				b = scr_h / (mi.dot * mi.line);
 				bb = b + Hni[bt];
 				haba = Hni[bt];
 				a = b * mi.dot * mi.line; //開始点

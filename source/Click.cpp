@@ -165,7 +165,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 	line = mi.line;
 	//マウスの座標を取得
 	mouse_data.GetMousePosition(&mouse_x,&mouse_y);
-	ptx = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+	ptx = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 	
 	long Ry;	// 2010.08.14 
 	Ry = -12*(Last_mouse_y - 95 + scr_v);	// 2010.08.14 
@@ -175,7 +175,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 		if(wParam & MK_LBUTTON){
 
 			//if(PutStartX>-99999+1){ //音符ドラッグ 2010.09.23 D
-			if(PutStartX>-99999+1 && ( 95 - (mouse_y/12 + scr_v)!=Last_mouse_y || (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot != Last_mouse_x)){ //音符ドラッグ //2010.09.23 A
+			if(PutStartX>-99999+1 && ( 95 - (mouse_y/12 + scr_v)!=Last_mouse_y || (mouse_x - KEYWIDTH)/NoteWidth + scr_h != Last_mouse_x)){ //音符ドラッグ //2010.09.23 A
 				if(ptx < PutStartX){	// 2010.08.14 C
 					ptx = PutStartX;	// 2010.08.14 C
 				}
@@ -183,7 +183,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 					AdjustX = org_data.SearchNoteC(PutStartX, (unsigned char)(95 - (mouse_y/12 + scr_v)), 16 / NoteWidth, 16 % NoteWidth); //2014.05.28
 					if(AdjustX > 0) ptx -= AdjustX;
 				}else AdjustX = 0;
-				if( 95 - (mouse_y/12 + scr_v)!=Last_mouse_y && (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot == Last_mouse_x ){ // 2010.09.23 A y軸のみの移動ではnoteの長さ変えない
+				if( 95 - (mouse_y/12 + scr_v)!=Last_mouse_y && (mouse_x - KEYWIDTH)/NoteWidth + scr_h == Last_mouse_x ){ // 2010.09.23 A y軸のみの移動ではnoteの長さ変えない
 					org_data.PutMusic();//楽譜の再描画
 					RedrawWindow(hWnd,&rectNOTE,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				}else{
@@ -198,7 +198,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 			}
 
 			if(mouse_y >= WHeight+292-WHNM && mouse_y < WHeight+(351+7)-WHNM){//パン配置
-				mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+				mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 				mouse_y = (WHeight+(351+5)-WHNM - mouse_y)/5;//96*12は楽譜の縦サイズ(Pixel)
 
 				if(org_data.SetPan2(mouse_x,(unsigned char)mouse_y)==TRUE){ //存在する音符のみ変更	// 2010.08.14 C
@@ -206,7 +206,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 					RedrawWindow(hWnd,&rectPAN,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 				}
 			}else if(mouse_y >= WHeight+365-WHNM && mouse_y < WHeight+428-WHNM){//ボリューム配置
-				mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+				mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 				mouse_y = (WHeight+428-WHNM - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 				if(Last_VOL_Drag_mouse_x > -99999){
 					long xxx, xxxplusvalue, xxxredraw = 0;
@@ -236,7 +236,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 		}
 		else if(wParam & MK_RBUTTON){
 			if(mouse_y >= WHeight+365-WHNM && mouse_y < WHeight+428-WHNM){//ボリューム配置
-				mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+				mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 				mouse_y = (WHeight+428-WHNM - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 				if(Last_VOL_Drag_mouse_x > -99999){ //2014.05.03 A //ドラッグ開始ポイントがVOLでなかったらSetUndoをキャンセルされている可能性もある。
 					long xxx, xxxplusvalue, xxxredraw = 0;
@@ -270,7 +270,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 	}
 	if(wParam & MK_LBUTTON){
 		//左ボタンドラッグ
-		Note_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ; //ノートのx座標
+		Note_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h; //ノートのx座標
 		if(Note_x>StartNotex){
 			if(sGrid || alt_down == 1){
 				nc_Select.x1_1=MinimumGrid(StartNotex);
@@ -367,7 +367,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 //	if(mouse_y >= 0 && mouse_y < 288+WDWHEIGHTPLUS){//音符配置
 	if(mouse_y >= 0 && mouse_y < WHeight+288-WHNM){//音符配置
 		//取得した座標を楽譜座標に変換
-		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 		mouse_y = 95 - (mouse_y/12 + scr_v);//96*12は楽譜の縦サイズ(Pixel)
 		if(mouse_y<0)return; //範囲外
 		//音符を配置
@@ -383,7 +383,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 		ClearDrag();
 //	}else if(mouse_y >= 292+WDWHEIGHTPLUS && mouse_y < 351+7+WDWHEIGHTPLUS){//パン配置
 	}else if(mouse_y >= WHeight+292-WHNM && mouse_y < WHeight+(351+7)-WHNM){//パン配置
-		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 //		mouse_y = (351+5+WDWHEIGHTPLUS - mouse_y)/5;//96*12は楽譜の縦サイズ(Pixel)
 		mouse_y = (WHeight+(351+5)-WHNM - mouse_y)/5;//96*12は楽譜の縦サイズ(Pixel)
 		if((mouse_x != Last_mouse_x) ||(mouse_y != Last_mouse_y))SetUndo();
@@ -393,7 +393,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 		ClearDrag();
 //	}else if(mouse_y >= 365+WDWHEIGHTPLUS && mouse_y < 428+WDWHEIGHTPLUS){//ボリューム配置
 	}else if(mouse_y >= WHeight+365-WHNM && mouse_y < WHeight+428-WHNM){//ボリューム配置
-		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 //		mouse_y = (428+WDWHEIGHTPLUS - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 		mouse_y = (WHeight+428-WHNM - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 		if((mouse_x != Last_mouse_x) ||(mouse_y != Last_mouse_y))SetUndo();
@@ -406,7 +406,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 		ClearDrag();
 	}else if(mouse_y >=WHeight-13 && mouse_y<=WHeight-2){ //選択範囲
 		if((wParam & MK_SHIFT)&&(tra>=0)){ //追加モード
-			Note_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ; //ノートのx座標
+			Note_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h; //ノートのx座標
 			if(Note_x>nc_Select.x1_1){
 				if(sGrid || alt_down == 1){
 					nc_Select.x1_2=MaximumGrid(Note_x);
@@ -427,7 +427,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 		}else{
 			//シフトが押されていなかったら開始点とみなす
 			DragStartx = mouse_x;
-			StartNotex = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ; //ノートのx座標
+			StartNotex = (mouse_x - KEYWIDTH)/NoteWidth + scr_h; //ノートのx座標
 			if(sGrid || alt_down == 1){ //グリッド使用
 				nc_Select.x1_1 = MinimumGrid(StartNotex);
 				nc_Select.x1_2 = MaximumGrid(StartNotex);
@@ -491,7 +491,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 //	if(mouse_y >= 0 && mouse_y < 288+WDWHEIGHTPLUS){
 	if(mouse_y >= 0 && mouse_y < WHeight+288-WHNM){
 		//取得した座標を楽譜座標に変換
-		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 		mouse_y = 95  - (mouse_y/12 + scr_v);//96*12は楽譜の縦サイズ(Pixel)
 		if(NoteWidth != 16){
 			AdjustX = org_data.SearchNoteC(mouse_x, (unsigned char)mouse_y, 16 / NoteWidth, 16 % NoteWidth); //2014.05.28
@@ -513,7 +513,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 //	}else if(mouse_y >= 292+WDWHEIGHTPLUS && mouse_y < 351+7+WDWHEIGHTPLUS){//パン配置
 	}else if(mouse_y >= WHeight+292-WHNM && mouse_y < WHeight+351+7-WHNM){//パン配置
-		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 //		mouse_y = (351+5+WDWHEIGHTPLUS - mouse_y)/5;//96*12は楽譜の縦サイズ(Pixel)
 		mouse_y = (WHeight+351+5-WHNM - mouse_y)/5;//96*12は楽譜の縦サイズ(Pixel)
 		if(org_data.CutPan(mouse_x,(unsigned char)mouse_y)==FALSE)ResetLastUndo();
@@ -522,7 +522,7 @@ void ClickProcR(WPARAM wParam, LPARAM lParam)
 		ClearDrag();
 //	}else if(mouse_y >= 365+WDWHEIGHTPLUS && mouse_y < 428+WDWHEIGHTPLUS){//ボリューム配置
 	}else if(mouse_y >= WHeight+365-WHNM && mouse_y < WHeight+428-WHNM){//ボリューム配置
-		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 //		mouse_y = (428+WDWHEIGHTPLUS - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 		mouse_y = (WHeight+428-WHNM - mouse_y)*4;//96*12は楽譜の縦サイズ(Pixel)
 		//if(org_data.CutVolume(mouse_x,(unsigned char)mouse_y)==FALSE)ResetLastUndo(); //2014.05.03 D //このままドラッグされるとアンドゥできない
@@ -572,7 +572,7 @@ void ClickProcM(WPARAM wParam, LPARAM lParam)
 
 	if(mouse_y >= 0 && mouse_y < WHeight+288-WHNM){
 		//取得した座標を楽譜座標に変換
-		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h*line*dot ;
+		mouse_x = (mouse_x - KEYWIDTH)/NoteWidth + scr_h;
 		mouse_y = 95  - (mouse_y/12 + scr_v);//96*12は楽譜の縦サイズ(Pixel)
 
 

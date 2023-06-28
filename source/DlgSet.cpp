@@ -9,7 +9,7 @@
 #include "resource.h"
 #include "OrgData.h"
 #include "Gdi.h"
-#include    <commctrl.h>
+#include <commctrl.h>
 #include "Mouse.h"
 #include "rxoFunction.h"
 
@@ -23,6 +23,7 @@
 extern HWND hDlgTrack;
 extern HWND hDlgPlayer;
 extern HWND hDlgEZCopy;
+extern char* gSelectedTheme;
 
 
 typedef struct{
@@ -85,8 +86,12 @@ int SamplePlayHeight = 36; //サンプル音を鳴らす高さ
 
 int SaveWithInitVolFile;	//曲データと…セーブするか。
 
+int preciselr = 0;
+
 extern HINSTANCE hInst;//インスタンスハンドル
 extern void ClearEZC_Message(); //EZメッセージと範囲を消す
+extern void ReloadBitmaps();
+extern void GetApplicationPath(char* path);
 
 double GetNormDistRand(){
 	double x, y;
@@ -188,10 +193,11 @@ void InitSettingDialog(HWND hdwnd)
 
 	SendDlgItemMessage(hdwnd,IDD_LB1,LB_SETCURSEL,i,0);
 	//リピート範囲の初期化//////////////////
-	a = mi.repeat_x / (mi.dot * mi.line);
+	CheckDlgButton(hdwnd, IDC_CHECK_PRECISELR, preciselr ? 1 : 0);
+	a = mi.repeat_x / (preciselr ? 1 : (mi.dot * mi.line));
 	itoa(a,str,10);
 	SetDlgItemText(hdwnd,IDD_REP_MEAS,str);
-	a = mi.end_x / (mi.dot * mi.line);
+	a = mi.end_x / (preciselr ? 1 : (mi.dot * mi.line));
 	itoa(a,str,10);
 	SetDlgItemText(hdwnd,IDD_END_MEAS,str);
 	//の初期化//////////////////
@@ -284,10 +290,10 @@ BOOL SetRepeat(HWND hdwnd, MUSICINFO *mi)
 	long a,b;
 	GetDlgItemText(hdwnd,IDD_REP_MEAS,str,7);
 	a = atol(str);
-	mi->repeat_x = (unsigned short)a*mi->line*mi->dot;
+	mi->repeat_x = (unsigned short)a * (preciselr ? 1 : (mi->dot * mi->line));
 	GetDlgItemText(hdwnd,IDD_END_MEAS,str,7);
 	b = atol(str);
-	mi->end_x = (unsigned short)b*mi->line*mi->dot;
+	mi->end_x = (unsigned short)b * (preciselr ? 1 : (mi->dot * mi->line));
 	if(mi->end_x <= mi->repeat_x){
 		//MessageBox(hdwnd,"あたま＜おわり に設定してください","ERROR(リピート範囲)",MB_OK);	// 2014.10.19 D
 		msgbox(hdwnd,IDS_WARNING_FROM_TO,IDS_ERROR_REPERT,MB_OK);	// 2014.10.19 A
@@ -397,6 +403,21 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				}
 			}
 			break;
+		case IDC_CHECK_PRECISELR:
+			i = preciselr;
+			if (IsDlgButtonChecked(hdwnd, IDC_CHECK_PRECISELR)) preciselr = 1;
+			else preciselr = 0;
+			if (preciselr != i) {
+				org_data.GetMusicInfo(&mi);
+
+				i = mi.repeat_x / (preciselr == 1 ? 1 : (mi.dot * mi.line));
+				itoa(i, str, 10);
+				SetDlgItemText(hdwnd, IDD_REP_MEAS, str);
+				i = mi.end_x / (preciselr == 1 ? 1 : (mi.dot * mi.line));
+				itoa(i, str, 10);
+				SetDlgItemText(hdwnd, IDD_END_MEAS, str);
+			}
+			break;
 		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_SETWAIT: case IDC_BPM:
 		case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
 		case IDD_SETFREQ0: case IDD_SETFREQ1: case IDD_SETFREQ2: case IDD_SETFREQ3: case IDD_SETFREQ4: case IDD_SETFREQ5: case IDD_SETFREQ6: case IDD_SETFREQ7:
@@ -408,6 +429,9 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 1;
 		case IDOK:
 			org_data.GetMusicInfo( &mi );
+
+			SetUndo();
+
 			if(!SetWait(hdwnd, &mi))return 1;
 			if(!SetGrid(hdwnd,&mi))return 1;
 			if(!SetRepeat(hdwnd, &mi))return 1;
@@ -619,6 +643,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			switch(LOWORD(wParam)){
 			case IDOK:
 				Rxo_StopAllSoundNow();
+				SetUndo();
 				n = 0;
 				for(j = 0; j < MAXMELODY; j++){
 					GetDlgItemText(hdwnd,IDD_SETFREQx0+j,str,7); i = atol(str); mi.tdata[j].freq = (i>0xFFFF) ? 0xFFFF : i;
@@ -820,6 +845,95 @@ BOOL CALLBACK DialogNoteUsed(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPa
 			EndDialog(hdwnd,0);
 			return 1;
 		}
+	}
+	return 0;
+}
+
+BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	int i, j;
+	switch (message) {
+	case WM_INITDIALOG://ダイアログが呼ばれた
+	{
+		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"Organya 3 (default)");
+
+		WIN32_FIND_DATA fdFile;
+		HANDLE hFind = NULL;
+		
+		char sDir[MAX_PATH];
+		GetApplicationPath(sDir);
+		strcat(sDir, "themes");
+
+		char sPath[MAX_PATH];
+		sprintf(sPath, "%s\\*.*", sDir);
+
+		if ((hFind = FindFirstFile(sPath, &fdFile)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (strcmp(fdFile.cFileName, ".") != 0
+					&& strcmp(fdFile.cFileName, "..") != 0)
+				{
+					sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+
+					if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // It should be a theme folder
+					{
+						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)fdFile.cFileName);
+					}
+				}
+			} while (FindNextFile(hFind, &fdFile));
+
+			FindClose(hFind);
+		}
+
+		EnableDialogWindow(FALSE);
+		return 1;
+	}
+	case WM_COMMAND:
+	{
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			gSelectedTheme[0] = 0;
+
+			char sDir[MAX_PATH];
+			GetApplicationPath(sDir);
+
+			i = SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETCURSEL, 0, 0);
+			if (i != 0) {
+				j = SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETTEXTLEN, i, 0);
+				if (j != LB_ERR) {
+					char* nam = (char*)malloc(j + 1);
+					if (nam != NULL) {
+						memset(nam, '\0', sizeof(nam));
+						SendDlgItemMessage(hdwnd, IDD_THEMES, LB_GETTEXT, i, (LPARAM)nam);
+						strcat(sDir, "themes\\");
+						strcat(sDir, nam);
+						free(nam);
+					}
+				}
+
+				DWORD dwAttrib = GetFileAttributes(sDir);
+				if (dwAttrib != INVALID_FILE_ATTRIBUTES && dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
+					strcpy(gSelectedTheme, sDir);
+			}
+
+			ReloadBitmaps();
+
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		case IDCANCEL:
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		case IDC_OPNTHMFLD:
+			char themePath[MAX_PATH];
+			GetApplicationPath(themePath);
+			strcat(themePath, "themes");
+			ShellExecute(NULL, "open", themePath, NULL, NULL, SW_SHOWDEFAULT);
+			break;
+		}
+		return 1;
+	}
 	}
 	return 0;
 }

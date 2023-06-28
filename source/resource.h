@@ -1,11 +1,12 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by Script1.rc
 //
 #define IDS_STRING1                     1
 #define IDS_TITLE                       2
 #define IDS_CANCEL                      3
 #define IDS_CHANGE_KEY                  4
+#define IDC_OPNTHMFLD                   4
 #define IDS_CHANGE_PAN                  5
 #define IDS_CHANGE_VOLUME               6
 #define IDS_CLEAR_RECENT                7
@@ -123,6 +124,7 @@
 #define IDR_ACCELERATOR1                164
 #define IDD_DIALOGOPEN                  190
 #define IDD_MIDI                        232
+#define IDD_DIALOG1                     236
 #define IDD_LB1                         1001
 #define IDM_DIALOG1                     1002
 #define IDM_DLGGRID                     1002
@@ -402,6 +404,10 @@
 #define IDC_BTN1                        1212
 #define IDC_ALL_SQUAREWAVE4             1213
 #define IDC_BTN2                        1213
+#define IDD_THEMES                      1213
+#define IDC_CHECK_PRECISELR             1214
+#define IDC_LEFTSTEP                    1215
+#define IDC_RIGHTSTEP                   1216
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -664,14 +670,17 @@
 #define IDM_NOTE_ENLARGE                40286
 #define IDM_PRESSNOTE                   40287
 #define ID_AC_PRESSNOTE                 40288
+#define IDM_METRONOME                   40289
+#define IDM_DLGTHEMES                   40290
+#define IDM_SMOOTHSCROLL                40291
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        236
-#define _APS_NEXT_COMMAND_VALUE         40289
-#define _APS_NEXT_CONTROL_VALUE         1213
+#define _APS_NEXT_RESOURCE_VALUE        239
+#define _APS_NEXT_COMMAND_VALUE         40292
+#define _APS_NEXT_CONTROL_VALUE         1217
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

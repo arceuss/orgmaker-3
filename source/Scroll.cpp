@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include "resource.h"
 //スクロールバーの移動値
-#define MAXHORZRANGE	256
 #define MAXVERTRANGE	(72-12)//8オクターブ
 
 #define BUF_SIZE 256
@@ -22,7 +21,8 @@ BOOL ScrollData::InitScroll(void)
 {
 	scr_info.cbSize = sizeof(SCROLLINFO);
 	scr_info.fMask = SIF_RANGE | SIF_PAGE;
-	scr_info.nMin = 0;scr_info.nMax = MAXHORZRANGE;
+	scr_info.nMin = 0;
+	scr_info.nMax = MAXHORZRANGE;
 	scr_info.nPage = 4;
 	SetScrollInfo(hWnd,SB_HORZ,&scr_info,1);//横
 	scr_info.cbSize = sizeof(SCROLLINFO);
@@ -58,6 +58,16 @@ void ScrollData::ChangeVerticalRange(int WindowHeight){ //ウィンドウサイズを元に
 	SetScrollInfo(hWnd, SB_VERT, &scr_info, TRUE);//縦
 	return;
 }
+void ScrollData::ChangeHorizontalRange(int range) { //ウィンドウサイズを元にスクロール可能域を設定
+	MAXHORZRANGE = range;
+	if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
+	scr_info.cbSize = sizeof(SCROLLINFO);
+	scr_info.fMask = SIF_RANGE | SIF_PAGE;
+	scr_info.nMin = 0;
+	scr_info.nMax = MAXHORZRANGE;
+	scr_info.nPage = 4;
+	SetScrollInfo(hWnd, SB_HORZ, &scr_info, 1);
+}
 void ScrollData::AttachScroll(void)
 {
 	
@@ -83,16 +93,22 @@ void ScrollData::SetHorzScroll(long x)
 
 void ScrollData::PrintHorzPosition(void)
 {
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+	
 	char str[10];
-	itoa(hpos,str,10);
+	itoa(hpos / (mi.dot * mi.line),str,10);
 	SetDlgItemText(hDlgPlayer,IDE_VIEWMEAS,str);
-	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,"0");
+	itoa(hpos % (mi.dot * mi.line),str,10);
+	SetDlgItemText(hDlgPlayer,IDE_VIEWXPOS,str);
 
 }
 
 void ScrollData::HorzScrollProc(WPARAM wParam){
 	RECT rect = {0,0,WWidth,WHeight};//更新する領域
 	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+
 	switch(LOWORD(wParam)){
 	case SB_LINERIGHT://右へ
 		hpos++;
@@ -109,19 +125,25 @@ void ScrollData::HorzScrollProc(WPARAM wParam){
 		hpos = HIWORD(wParam);//現在位置を取得
 		break;
 	case SB_PAGERIGHT://右へ
-		hpos += 1;
+		hpos = (hpos / (mi.dot * mi.line) + 1) * (mi.dot * mi.line);
 		if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
 		break;
 	case SB_PAGELEFT://左へ
-		hpos -= 1;
-		if(hpos < 0)hpos = 0;
+	{
+		int mk = (mi.dot * mi.line);
+		int cap = (hpos / mk) * mk;
+		if (hpos > cap) hpos = cap;
+		else hpos = cap - mk;
+
+		if (hpos < 0)hpos = 0;
 		break;
+	}
+
 	}
 	//プレイヤーに反映
 	PrintHorzPosition();
 	if(timer_sw == 0){
-		org_data.GetMusicInfo(&mi);
-		org_data.SetPlayPointer(hpos*mi.dot*mi.line);
+		org_data.SetPlayPointer(hpos);
 	}
 	scr_info.fMask = SIF_POS;//nPosを有効に
 	scr_info.nPos = hpos;
@@ -154,21 +176,21 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 		vpos = HIWORD(wParam);//現在位置を取得
 		break;
 	case SB_PAGEDOWN://下へ
-		vpos += 6;
+		vpos += 12;
 		if(vpos > vScrollMax)vpos = vScrollMax;
 		break;
 	case SB_PAGEUP://上へ
-		vpos -= 6;
+		vpos -= 12;
 		if(vpos < 0)vpos = 0;
 		break;
 	}
 	PrintHorzPosition();
-	scr_info.fMask = SIF_POS;//nPosを有効に
+	scr_info.fMask = SIF_POS;//Enable nPos
 	scr_info.nPos = vpos;
 	SetScrollInfo(hWnd,SB_VERT,&scr_info,1);
 	org_data.PutMusic();
 	RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
-	//以下はテスト用
+	//below is for testing
 //	char str[80];
 //	HDC hdc;
 //	hdc = GetDC(hWnd);
@@ -176,7 +198,7 @@ void ScrollData::VertScrollProc(WPARAM wParam){
 //	TextOut(hdc,100,1,str,strlen(str));
 //	ReleaseDC(hWnd,hdc);
 }
-//スクロールポジションの取得
+//Get scroll position
 void ScrollData::GetScrollPosition(long *hp,long *vp)
 {
 	*hp = hpos;
@@ -184,7 +206,7 @@ void ScrollData::GetScrollPosition(long *hp,long *vp)
 }
 
 void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
-	RECT rect = {0,0,WWidth,WHeight};//更新する領域
+	RECT rect = {0,0,WWidth,WHeight};//Area to update
 
 	int fwKeys, zDelta, xPos,yPos;
 
@@ -195,19 +217,19 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 
 	/*
 	switch(LOWORD(wParam)){
-	case SB_LINEDOWN://下へ
+	case SB_LINEDOWN://Downwards
 		vpos++;
 		if(vpos > MAXVERTRANGE)vpos = MAXVERTRANGE;
 		break;
-	case SB_LINEUP://上へ
+	case SB_LINEUP://up
 		vpos--;
 		if(vpos < 0)vpos = 0;
 		break;
 	case SB_THUMBPOSITION:
-		vpos = HIWORD(wParam);//現在位置を取得
+		vpos = HIWORD(wParam);//Get current position
 		break;
 	case SB_THUMBTRACK:
-		vpos = HIWORD(wParam);//現在位置を取得
+		vpos = HIWORD(wParam);//Get current position
 		break;
 	case SB_PAGEDOWN://下へ
 		vpos += 6;
@@ -222,18 +244,16 @@ void ScrollData::WheelScrollProc(LPARAM lParam, WPARAM wParam){
 	
 	if(zDelta<0){
 		if(fwKeys && MK_CONTROL){
-			hpos -= 1;
-			if(hpos < 0)hpos = 0;
-			
+			hpos += 4;
+			if (hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
 		}else{
 			vpos+=4;
 			if(vpos > vScrollMax)vpos = vScrollMax;
 		}
 	}else{
 		if(fwKeys && MK_CONTROL){
-			hpos += 1;
-			if(hpos > MAXHORZRANGE)hpos = MAXHORZRANGE;
-			
+			hpos -= 4;
+			if (hpos < 0)hpos = 0;
 		}else{
 			vpos-=4;
 			if(vpos < 0)vpos = 0;
@@ -258,16 +278,16 @@ void ScrollData::KeyScroll(int iDirection)
 	RECT rect = {0,0,WWidth,WHeight};//更新する領域
 	switch(	iDirection ){
 	case DIRECTION_UP:
-		vpos-=4;
+		vpos--;
 		break;
 	case DIRECTION_DOWN:
-		vpos+=4;
+		vpos++;
 		break;
 	case DIRECTION_LEFT:
-		hpos -= 1;
+		hpos--;
 		break;
 	case DIRECTION_RIGHT:
-		hpos += 1;
+		hpos++;
 		break;
 	}
 	if(hpos < 0)hpos = 0;

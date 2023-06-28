@@ -52,6 +52,8 @@ extern void ChangeEnablePlaying(int iValue=-1);
 extern void ChangeFinish(int iValue=-1);
 extern void ChangeSlideOverlapNoteMode(int iValue = -1);
 extern void ChangePushStratchNOTE(int iValue = -1);
+extern void ChangeMetronomeMode(int iValue = -1);
+extern void ChangeScrollMode(int iValue = -1);
 
 void PutRecentFile(char *FileName);
 void LoadRecentFromIniFile();
