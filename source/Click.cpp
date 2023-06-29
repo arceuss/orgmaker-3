@@ -59,7 +59,7 @@ void RedrawClick()
 
 void SelectReset()
 {
-	tra=-256;
+	tra = -256;
 	DragStartx = -99999;
 	RedrawClick();
 	SetEZCWindowMessage("");
