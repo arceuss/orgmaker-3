@@ -146,12 +146,12 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_ENABLED);
 				DragAcceptFiles(hWnd,TRUE);//ƒhƒ‰ƒbƒO‹–‰Â
 				org_data.GetMusicInfo(&mi);
+				QuitMMTimer(); // Quit timer first
 				Rxo_StopAllSoundNow();	// 2010.11.30 C
 				/*
 				for(int i = 0; i < MAXMELODY; i++)
 					PlayOrganObject(NULL,2 ,i,NULL);
 					*/
-				QuitMMTimer();
 				timer_sw = 0;
 			}
 			SetFocus(hWnd);

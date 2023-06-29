@@ -1312,19 +1312,23 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 			break;
 		case VK_TAB:
-			if((lParam & 0x40000000) ==0 && (timer_sw==0 || iChangeEnablePlaying!=0)) iPushShift[0]=1;
-			Rxo_StopAllSoundNow();
+			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
+				iPushShift[0] = 1;
+				Rxo_StopAllSoundNow();
+			}
 			break;
 		case VK_SHIFT:
-			if((lParam & 0x40000000) ==0 && (timer_sw==0 || iChangeEnablePlaying!=0)) iPushShift[1]=1;
-			Rxo_StopAllSoundNow();
+			if ((lParam & 0x40000000) == 0 && (timer_sw == 0 || iChangeEnablePlaying != 0)) {
+				iPushShift[1] = 1;
+				Rxo_StopAllSoundNow();
+			}
 			break;
 		}
 		break;
 //				wsprintf(strSize , "U lParam = %x" , lParam);
 //				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 	case WM_KEYUP: //keyboard released
-		switch(wParam){
+		switch(wParam) {
 		case 'Z':
 		case 'S':
 		case 'X':
