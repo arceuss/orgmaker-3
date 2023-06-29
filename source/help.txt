@@ -1,4 +1,4 @@
-Organya 3   Ver3.0.0   Simple Help
+Organya 3   Ver3.0.1   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   Basic usage is the same as "Organya 1" developed by Mr. Pixel.
@@ -263,10 +263,10 @@ Organya 3   Ver3.0.0   Simple Help
 
   3.0.0  2023/06/28  Added smoother horizontal scrolling (per note instead of per measure)
                      Added metronome option
-					 Added custom theme support
-					 Added support for more precise loop regions (per note instead of per measure)
+                     Added custom theme support
+                     Added support for more precise loop regions (per note instead of per measure)
                      Fixed "crash" bug when zooming/scrolling while playing song
-					 Very many bug fixes
+                     Very many bug fixes
                      Some small tweaks to scrolling
 
   2.1.0  2014/05/31  Added Insert and Remove functions
