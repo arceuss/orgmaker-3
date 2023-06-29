@@ -258,6 +258,9 @@ Organya 3   Ver3.0.0   Simple Help
 
 # Revision History 
 
+  3.0.1  2023/06/28  Fixed incorrect save for some options
+                     Fixed option bug with TAB & SHIFT key
+
   3.0.0  2023/06/28  Added smoother horizontal scrolling (per note instead of per measure)
                      Added metronome option
 					 Added custom theme support
