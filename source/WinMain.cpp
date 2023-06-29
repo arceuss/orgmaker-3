@@ -1532,9 +1532,9 @@ void SaveIniFile()
 	WritePrivateProfileString(MAIN_WINDOW,"DrawDouble",num_buf,app_path);
 	wsprintf(num_buf,"%d",iDragMode);
 	WritePrivateProfileString(MAIN_WINDOW,"DragMode",num_buf,app_path);
-	wsprintf(num_buf,"%d",iChangeEnablePlaying);
+	wsprintf(num_buf, "%d", iPushStratch);
 	WritePrivateProfileString(MAIN_WINDOW,"EnablePressNoteStretch",num_buf,app_path);
-	wsprintf(num_buf,"%d",iPushStratch);
+	wsprintf(num_buf, "%d", iChangeEnablePlaying);
 	WritePrivateProfileString(MAIN_WINDOW,"EnablePlaying",num_buf,app_path);
 	wsprintf(num_buf,"%d",iChangeFinish);
 	WritePrivateProfileString(MAIN_WINDOW,"QuitMessage",num_buf,app_path);
