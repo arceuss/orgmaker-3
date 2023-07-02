@@ -73,7 +73,7 @@ bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
 
-long MAXHORZRANGE = 4096;
+long MAXHORZRANGE = MAXHORZMEAS * 16;
 
 int WWidth = WINDOWWIDTH, WHeight = WINDOWHEIGHT;
 

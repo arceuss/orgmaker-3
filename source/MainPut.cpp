@@ -210,9 +210,10 @@ void OrgData::PutNumber(void)
 	long scr_h,scr_v;
 	long scalepos;
 	int off, x;
-	char k100,k10,k1;
+	char k1000,k100,k10,k1;
 	char i,j;
 	char k = info.dot*info.line;
+	char rr = 0;
 	GetMusicInfo(&mi);
 	scr_data.GetScrollPosition(&scr_h, &scr_v);
 	j = (WWidth/NoteWidth)/k + (scr_h % k != 0 ? 1 : 0);
@@ -220,7 +221,11 @@ void OrgData::PutNumber(void)
 	for(i = 0; i <= j; i++){
 		scalepos = scr_h / (mi.dot * mi.line);
 		scalepos += i;
-		k100 = k10 = k1 = 0;
+		k1000 = k100 = k10 = k1 = 0;
+		while (scalepos >= 1000) {
+			k1000++;
+			scalepos -= 1000;
+		}
 		while(scalepos >= 100){
 			k100++;
 			scalepos -= 100;
@@ -231,25 +236,38 @@ void OrgData::PutNumber(void)
 		}
 		
 		off = (-(scr_h % (info.dot * info.line)) * NoteWidth);
-		x = k * i * NoteWidth + 0 + KEYWIDTH + 1 + off;
-		if (x >= KEYWIDTH)
-			PutBitmap(x,0,&num_rect[k100],BMPNUMBER);
-		x = k * i * NoteWidth + 8 + KEYWIDTH + 1 + off;
-		if (x >= KEYWIDTH)
-			PutBitmap(x,0,&num_rect[k10],BMPNUMBER);
-		x = k * i * NoteWidth + 16 + KEYWIDTH + 1 + off;
-		if (x >= KEYWIDTH)
-			PutBitmap(x,0,&num_rect[scalepos],BMPNUMBER);
-		if(WHeight>550){
+		if (k1000 > 0) {
 			x = k * i * NoteWidth + 0 + KEYWIDTH + 1 + off;
 			if (x >= KEYWIDTH)
-				PutBitmap(x,WHeight+288-WHNM-12,&num_rect[k100],BMPNUMBER);
-			x = k * i * NoteWidth + 8 + KEYWIDTH + 1 + off;
+				PutBitmap(x, 0, &num_rect[k1000], BMPNUMBER);
+			rr = 8;
+		}
+		x = k * i * NoteWidth + 0 + rr + KEYWIDTH + 1 + off;
+		if (x >= KEYWIDTH)
+			PutBitmap(x, 0, &num_rect[k100], BMPNUMBER);
+		x = k * i * NoteWidth + 8 + rr + KEYWIDTH + 1 + off;
+		if (x >= KEYWIDTH)
+			PutBitmap(x, 0, &num_rect[k10], BMPNUMBER);
+		x = k * i * NoteWidth + 16 + rr + KEYWIDTH + 1 + off;
+		if (x >= KEYWIDTH)
+			PutBitmap(x, 0, &num_rect[scalepos], BMPNUMBER);
+		if(WHeight>550){
+			rr = 0;
+			if (k1000 > 0) {
+				x = k * i * NoteWidth + 0 + KEYWIDTH + 1 + off;
+				if (x >= KEYWIDTH)
+					PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[k1000], BMPNUMBER);
+				rr = 8;
+			}
+			x = k * i * NoteWidth + 0 + rr + KEYWIDTH + 1 + off;
 			if (x >= KEYWIDTH)
-				PutBitmap(x,WHeight+288-WHNM-12,&num_rect[k10],BMPNUMBER);
-			x = k * i * NoteWidth + 16 + KEYWIDTH + 1 + off;
+				PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[k100], BMPNUMBER);
+			x = k * i * NoteWidth + 8 + rr + KEYWIDTH + 1 + off;
 			if (x >= KEYWIDTH)
-				PutBitmap(x,WHeight+288-WHNM-12,&num_rect[scalepos],BMPNUMBER);
+				PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[k10], BMPNUMBER);
+			x = k * i * NoteWidth + 16 + rr + KEYWIDTH + 1 + off;
+			if (x >= KEYWIDTH)
+				PutBitmap(x, WHeight + 288 - WHNM - 12, &num_rect[scalepos], BMPNUMBER);
 		}
 	}
 	//ÉLÅ[Çï\é¶
