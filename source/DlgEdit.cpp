@@ -13,6 +13,7 @@ extern HWND hDlgTrack;
 extern NOTECOPY nc_Select; //‘I‘ð”ÍˆÍ
 extern int tra, ful ,haba; 
 extern char TrackN[];
+extern char *dram_name[];
 
 BOOL CALLBACK DialogDelete(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -607,8 +608,12 @@ BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			org_data.SwapTrack(&nc);
 
 			org_data.GetMusicInfo(&mi);
-			MakeOrganyaWave(nc.track1, mi.tdata[nc.track1].wave_no, mi.tdata[nc.track1].pipi);
-			MakeOrganyaWave(nc.track2, mi.tdata[nc.track2].wave_no, mi.tdata[nc.track2].pipi);
+
+			if (nc.track1 < MAXMELODY) MakeOrganyaWave(nc.track1, mi.tdata[nc.track1].wave_no, mi.tdata[nc.track1].pipi);
+			else InitDramObject(dram_name[mi.tdata[nc.track1].wave_no], nc.track1 - MAXMELODY);
+
+			if (nc.track2 < MAXMELODY) MakeOrganyaWave(nc.track2, mi.tdata[nc.track2].wave_no, mi.tdata[nc.track2].pipi);
+			else InitDramObject(dram_name[mi.tdata[nc.track2].wave_no], nc.track2 - MAXMELODY);
 			//•\Ž¦
 			org_data.PutMusic();
 			RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
