@@ -258,7 +258,7 @@ Organya 3   Ver3.0.3   Simple Help
 
 # Revision History 
 
-  3.0.3  2023/07/01  Updated some low quality strings
+  3.0.3  2023/07/15  Updated some low quality strings
                      Automatically detect loop precise mode on song load
                      Added "to end" button and re-arranged player dialog
 
