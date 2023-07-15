@@ -1470,6 +1470,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 void SetTitlebarText()
 {
 	int i, j;
+	char k;
 	char set_name[MAX_PATH + 20];//display space in title
 	char file_name[MAX_PATH];//Manipulate names (exclude directories)
 
@@ -1485,19 +1486,21 @@ void SetTitlebarText()
 		j++;
 	}
 	file_name[j] = NULL;
+
+	k = 0;
+	if (gFileModified) { // Lazy
+		set_name[0] = '*';
+		k = 1;
+	}
 	//put file name
 	for (i = 0; i < MAX_PATH; i++) {
 		if (file_name[i] == NULL)break;
-		set_name[i] = file_name[i];
-	}
-	if (gFileModified) { // Lazy
-		set_name[i] = '*';
-		i++;
+		set_name[i + k] = file_name[i];
 	}
 	//Insert app title
 	for (j = 0; j < 20; j++) {
-		set_name[i] = lpszName[j];
-		if (set_name[i] == NULL) break;
+		set_name[i + k] = lpszName[j];
+		if (set_name[i + k] == NULL) break;
 		i++;
 	}
 	SetWindowText(hWnd, &set_name[0]);
