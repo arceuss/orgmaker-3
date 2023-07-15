@@ -12,6 +12,7 @@ DWORD lastDrawTime = -1;
 extern HWND hDlgPlayer;
 extern int sMetronome;
 extern int sSmoothScroll;
+extern int NoteWidth;
 void OrgData::PlayData(void)
 {
 	char str[10];
@@ -68,7 +69,7 @@ void OrgData::PlayData(void)
 		DWORD dwNowTime;
 		dwNowTime = timeGetTime();
 		// Only draw if 8 ms have passed, to prevent lags
-		if (dwNowTime - lastDrawTime >= 8) { // 125 fps
+		if (dwNowTime - lastDrawTime >= 16 + ((16 - NoteWidth) * 4)) { // 62.5 fps
 			if (play_p != info.end_x) scr_data.SetHorzScroll(play_p);
 			else scr_data.SetHorzScroll(info.repeat_x);
 			lastDrawTime = dwNowTime;
