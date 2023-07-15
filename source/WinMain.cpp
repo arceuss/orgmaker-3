@@ -72,6 +72,7 @@ BOOL actApp;
 bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
+bool preciselr = false;
 
 long MAXHORZRANGE = MAXHORZMEAS * 16;
 
@@ -163,6 +164,12 @@ int CancelDeleteCurrentData(int iMessagePattern = 1){
 		}
 	} 
 	return 0;
+}
+
+void DetectPreciseMode() {
+	MUSICINFO mi;
+	org_data.GetMusicInfo(&mi);
+	preciselr = (mi.repeat_x % (mi.line * mi.dot) != 0) || (mi.end_x % (mi.line * mi.dot) != 0);
 }
 
 void InitBitmaps() {
@@ -439,6 +446,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				if(org_data.LoadMusicData()==TRUE){ //C 2010.09.25 Judgment added
 					SetModified(false);//title name set
                     gFileUnsaved = false;
+					DetectPreciseMode();
 					org_data.GetMusicInfo( &mi );
 					SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 					SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
@@ -529,6 +537,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				org_data.LoadMusicData();
 				SetModified(false);//title name set
                 gFileUnsaved = false;
+				DetectPreciseMode();
 				org_data.GetMusicInfo( &mi );
 				SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 				SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
@@ -673,6 +682,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				org_data.LoadMusicData();
 				SetModified(false);//title name set
                 gFileUnsaved = false;
+				DetectPreciseMode();
+
 				//Show to Player
 				org_data.GetMusicInfo( &mi );
 				SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
@@ -1195,6 +1206,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		org_data.InitOrgData();
 		org_data.LoadMusicData();
 		org_data.PutMusic();//View sheet music
+		DetectPreciseMode();
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		//Show to Player
 		org_data.GetMusicInfo( &mi );

@@ -89,7 +89,7 @@ BEGIN
     LTEXT           "Beat",IDC_STATIC,23,205,15,8
     EDITTEXT        IDD_GRIDEDIT2,39,202,15,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Step",IDC_STATIC,56,205,15,8
-    GROUPBOX        "Frequency (1000)",IDC_STATIC,76,53,49,142
+    GROUPBOX        "Freq. (1000)",IDC_STATIC,76,53,49,142
     LTEXT           "1",IDC_STATIC,81,66,8,8
     EDITTEXT        IDD_SETFREQ0,91,63,28,12,ES_RIGHT | ES_NUMBER
     LTEXT           "2",IDC_STATIC,81,82,8,8
@@ -120,20 +120,21 @@ BEGIN
     LTEXT           "Please enter the Wait value.\nBPM is an extra function for conversion.",IDC_STATIC,13,27,122,17
 END
 
-PLAYER DIALOGEX 405, 465, 201, 20
+PLAYER DIALOGEX 405, 465, 209, 20
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_BORDER
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Play",IDC_PLAY,90,2,23,16,BS_BITMAP | BS_CENTER | BS_VCENTER
-    PUSHBUTTON      "Stop",IDC_STOP,114,2,23,16,BS_BITMAP | BS_CENTER | BS_VCENTER
-    PUSHBUTTON      "Start",IDC_START,8,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
-    EDITTEXT        IDE_VIEWXPOS,180,3,20,15,ES_CENTER | ES_READONLY | ES_NUMBER,WS_EX_RIGHT
-    EDITTEXT        IDE_VIEWMEAS,158,3,22,15,ES_CENTER | ES_READONLY | ES_NUMBER
-    LTEXT           "Meas",IDC_STATIC,142,7,16,8
-    PUSHBUTTON      "Button1",IDC_LEFT,29,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
-    PUSHBUTTON      "Button1",IDC_RIGHT,74,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
-    PUSHBUTTON      "Button1",IDC_LEFTSTEP,44,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
-    PUSHBUTTON      "Button1",IDC_RIGHTSTEP,59,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    PUSHBUTTON      "Play",IDC_PLAY,52,2,23,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    PUSHBUTTON      "Stop",IDC_STOP,75,2,23,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    PUSHBUTTON      "Start",IDC_START,4,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    PUSHBUTTON      "End",IDC_END,131,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    EDITTEXT        IDE_VIEWXPOS,188,3,20,15,ES_CENTER | ES_READONLY | ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDE_VIEWMEAS,166,3,22,15,ES_CENTER | ES_READONLY | ES_NUMBER
+    LTEXT           "Meas",IDC_STATIC,150,7,16,8
+    PUSHBUTTON      "Button1",IDC_LEFT,21,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    PUSHBUTTON      "Button1",IDC_RIGHT,113,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    PUSHBUTTON      "Button1",IDC_LEFTSTEP,36,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
+    PUSHBUTTON      "Button1",IDC_RIGHTSTEP,99,2,15,16,BS_BITMAP | BS_CENTER | BS_VCENTER
 END
 
 TRACK DIALOGEX 200, 465, 229, 36
@@ -433,8 +434,8 @@ CAPTION "About Organya"
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,113,40,18
-    CTEXT           "Organya ver.3.0.2",IDC_STATIC,20,32,80,8
-    LTEXT           "2023 / 07 / 01",IDC_STATIC,37,43,44,8
+    CTEXT           "Organya ver.3.0.3",IDC_STATIC,20,32,80,8
+    LTEXT           "2023 / 07 / 15",IDC_STATIC,37,43,44,8
     CTEXT           "Organya 1 by Studio Pixel",IDC_STATIC,2,57,114,16,SS_CENTERIMAGE | SS_SUNKEN
     ICON            "ICON",ID_ICON_ORG,49,3,20,20,SS_NOTIFY,WS_EX_DLGMODALFRAME
     CTEXT           "Organya 2 by Rxo Inverse",IDC_STATIC,2,75,114,16,SS_CENTERIMAGE | SS_SUNKEN
@@ -589,7 +590,7 @@ BEGIN
     PUSHBUTTON      "x2",IDC_PST2,356,1,16,15,0,WS_EX_CLIENTEDGE
     PUSHBUTTON      "x3",IDC_PST3,372,1,16,15,0,WS_EX_CLIENTEDGE
     PUSHBUTTON      "x4",IDC_PST4,388,1,16,15,0,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "Del",IDC_DELETEBUTTON,439,1,24,15,0,WS_EX_CLIENTEDGE | WS_EX_STATICEDGE
+    PUSHBUTTON      "Clear",IDC_DELETEBUTTON,439,1,24,15,0,WS_EX_CLIENTEDGE | WS_EX_STATICEDGE
     PUSHBUTTON      "",IDC_BTNCLOSE,518,1,19,7,BS_CENTER | NOT WS_TABSTOP
     LTEXT           "Organya 3",IDC_COPYNOTION,1,18,292,9
     RTEXT           "Duplicate",IDC_STATIC,305,5,33,10
@@ -599,7 +600,7 @@ BEGIN
     CTEXT           "Grid",IDC_STATUS2,504,18,18,9,0,WS_EX_STATICEDGE
     CTEXT           "Drag",IDC_STATUS3,522,18,16,9,0,WS_EX_STATICEDGE
     PUSHBUTTON      "Insert",IDC_INSERTBUTTON,414,1,24,15,0,WS_EX_CLIENTEDGE | WS_EX_STATICEDGE
-    PUSHBUTTON      "Delete and Close",IDC_DELETEBUTTON_2,463,1,49,15,0,WS_EX_CLIENTEDGE | WS_EX_STATICEDGE
+    PUSHBUTTON      "Remove",IDC_DELETEBUTTON_2,463,1,49,15,0,WS_EX_CLIENTEDGE | WS_EX_STATICEDGE
     LTEXT           "",IDC_MESSAGE,296,18,180,9,0,WS_EX_STATICEDGE
 END
 
@@ -1029,6 +1030,8 @@ B_STOP                  BITMAP                  "Bitmap\\org_stop.bmp"
 
 B_HEAD                  BITMAP                  "Bitmap\\org_home.bmp"
 
+B_END                   BITMAP                  "Bitmap\\org_end.bmp"
+
 B_RIGHT                 BITMAP                  "Bitmap\\org_next.bmp"
 
 B_PLAY                  BITMAP                  "Bitmap\\org_play.bmp"
@@ -1194,8 +1197,8 @@ METRO02                 WAVE                    "Wave\\Metro02.wav"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,2,0
- PRODUCTVERSION 3,0,2,0
+ FILEVERSION 3,0,3,0
+ PRODUCTVERSION 3,0,3,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1213,11 +1216,11 @@ BEGIN
             VALUE "Comments", "Please ignore the rough parts. "
             VALUE "CompanyName", "No extra taste."
             VALUE "FileDescription", "Organya 3"
-            VALUE "FileVersion", "3.0.2"
+            VALUE "FileVersion", "3.0.3"
             VALUE "LegalCopyright", "Copyright (C) 2005-2023 Pixel and Rxo Inverse"
-            VALUE "OriginalFilename", "Org302.exe"
+            VALUE "OriginalFilename", "Organya.exe"
             VALUE "ProductName", "Organya 3"
-            VALUE "ProductVersion", "3.0.2"
+            VALUE "ProductVersion", "3.0.3"
         END
     END
     BLOCK "VarFileInfo"
@@ -1485,12 +1488,12 @@ BEGIN
     IDS_STRING65            "Save default pan/volume data"
     IDS_STRING66            "Load default pan/volume data"
     IDS_STRING67            "You must specify a range."
-    IDS_STRING68            " Deleted."
+    IDS_STRING68            " cleared."
     IDS_STRING69            "Since no range has been specified, one dot from the left edge of the screen is"
-    IDS_STRING70            " Deleted and filled."
-    IDS_STRING71            " Shifted back."
-    IDS_STRING72            " Copied %d times in %d measures-%d measures."
-    IDS_STRING73            " Copied %d times to measure %d-%d of track %c."
+    IDS_STRING70            " removed."
+    IDS_STRING71            " inserted."
+    IDS_STRING72            " copied %d times in %d measures-%d measures."
+    IDS_STRING73            " copied %d times to measure %d-%d of track %c."
     IDS_STRING74            "Track %c from measure %d-%d"
     IDS_STRING75            "All tracks from measure %d-%d"
     IDS_STRING76            "(none)"
@@ -1529,9 +1532,9 @@ BEGIN
     IDS_STRING101           "Automatically save/load *.pvi in the same folder as *.org"
     IDS_STRING102           "*.chm help is tasteless because I spared the time to create it"
     IDS_STRING103           "Meow!"
-    IDS_STRING104           "Track%c's"
-    IDS_STRING105           "The selected range"
-    IDS_STRING106           "The selected range of all tracks"
+    IDS_STRING104           "Track %c"
+    IDS_STRING105           " selection"
+    IDS_STRING106           "Selection of all tracks"
     IDS_GRID_STRING         "Custom Setting!4 Beat:4 Step!4 Beat:3 Step!3 Beat:4 Step!3 Beat:3 Step!4 Beat:6 Step!3 Beat:6 Step!4 Beat:2 Step!4 Beat:8 Step!4 Beat:12 Step!5 Beat:4 Step!!"
     IDS_STRING108           "Default Pan/Volume Data [*.pvi]!*.pvi!All Formats [*.*]!*.*!!"
     IDS_STRING109           "Organya Data [*.org]!*.org!All Formats [*.*]!*.*!!"

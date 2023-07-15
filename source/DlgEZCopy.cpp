@@ -363,7 +363,7 @@ void EZ_Paste(int iNum)
 	//if(ful==1)wsprintf(mss,"　%d小節～%d小節に%d回コピーしました。",scr_h,lash,nc_Select.num);	// 2014.10.19 D
 	if(ful==1)wsprintf(mss,MessageString[IDS_STRING72],scr_h / (mi.dot * mi.line),lash,nc_Select.num);	// 2014.10.19 A
 	//else wsprintf(mss,"　トラック%c の%d小節～%d小節に%d回コピーしました。",TrackN[nc_Select.track2],scr_h,lash,nc_Select.num);	// 2014.10.19 D
-	else wsprintf(mss,MessageString[IDS_STRING73],TrackN[nc_Select.track2],scr_h / (mi.dot * mi.line),lash,nc_Select.num);	// 2014.10.19 A
+	else wsprintf(mss,MessageString[IDS_STRING73],scr_h / (mi.dot * mi.line),lash,nc_Select.num,TrackN[nc_Select.track2]);	// 2014.10.19 A
 
 	strcpy(mks,CpHelp);
 	strcat(mks,mss);

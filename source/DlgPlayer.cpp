@@ -34,6 +34,7 @@ int mute_name[MAXTRACK] = {
 
 void LoadPlayerBitmaps(HWND hdwnd) {
 	LoadSingleBitmap(hdwnd, IDC_START, 24, 24, "B_HEAD");
+	LoadSingleBitmap(hdwnd, IDC_END, 24, 24, "B_END");
 	LoadSingleBitmap(hdwnd, IDC_PLAY, 40, 24, "B_PLAY");
 	LoadSingleBitmap(hdwnd, IDC_STOP, 40, 24, "B_STOP");
 	LoadSingleBitmap(hdwnd, IDC_LEFT, 24, 24, "B_LEFT");
@@ -186,6 +187,43 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				SetDlgItemText(hdwnd,IDE_VIEWXPOS,"0");
 				scr_data.SetHorzScroll(0);
 				org_data.SetPlayPointer(0);//頭出し
+				SetFocus(hWnd);
+			}
+			return 1;
+		case IDC_END:
+			if (timer_sw) {
+				//メニューを有効にする。
+				hmenu = GetMenu(hWnd);
+				hsubmenu = GetSubMenu(hmenu, 0);
+				EnableMenuItem(hmenu, 0, MF_BYPOSITION | MF_ENABLED);
+				EnableMenuItem(hmenu, 1, MF_BYPOSITION | MF_ENABLED);
+				EnableMenuItem(hmenu, 2, MF_BYPOSITION | MF_ENABLED);
+				//EnableMenuItem(hmenu,5,MF_BYPOSITION|MF_ENABLED);
+				EnableMenuItem(hmenu, 4, MF_BYPOSITION | MF_ENABLED);
+				EnableMenuItem(hmenu, 3, MF_BYPOSITION | MF_ENABLED);
+				EnableMenuItem(hmenu, 6, MF_BYPOSITION | MF_ENABLED);
+				EnableMenuItem(hmenu, 7, MF_BYPOSITION | MF_ENABLED);
+				EnableMenuItem(hmenu, 8, MF_BYPOSITION | MF_ENABLED);
+				DragAcceptFiles(hWnd, TRUE);//ドラッグ許可
+				org_data.GetMusicInfo(&mi);
+				QuitMMTimer(); // Quit timer first
+				Rxo_StopAllSoundNow();	// 2010.11.30 C
+				/*
+				for(int i = 0; i < MAXMELODY; i++)
+					PlayOrganObject(NULL,2 ,i,NULL);
+					*/
+				timer_sw = 0;
+			}
+			SetFocus(hWnd);
+			if (LOWORD(wParam) == IDC_END) {
+				//				PlayOrganKey(36,9,1000);
+				org_data.GetMusicInfo(&mi);
+				itoa(mi.end_x / (mi.dot * mi.line), str, 10);
+				SetDlgItemText(hdwnd, IDE_VIEWMEAS, str);
+				itoa(mi.end_x % (mi.dot * mi.line), str, 10);
+				SetDlgItemText(hdwnd, IDE_VIEWXPOS, str);
+				scr_data.SetHorzScroll(mi.end_x);
+				org_data.SetPlayPointer(mi.end_x);//頭出し
 				SetFocus(hWnd);
 			}
 			return 1;

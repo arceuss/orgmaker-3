@@ -1,4 +1,4 @@
-Organya 3   Ver3.0.2   Simple Help
+Organya 3   Ver3.0.3   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   Basic usage is the same as "Organya 1" developed by Mr. Pixel.
@@ -257,6 +257,10 @@ Organya 3   Ver3.0.2   Simple Help
 
 
 # Revision History 
+
+  3.0.3  2023/07/01  Updated some low quality strings
+                     Automatically detect loop precise mode on song load
+                     Added "to end" button and re-arranged player dialog
 
   3.0.2  2023/07/01  Fixed crash when swapping drum tracks
                      Increased max song length from 256 to 1024 measures

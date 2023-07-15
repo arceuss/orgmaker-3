@@ -86,7 +86,7 @@ int SamplePlayHeight = 36; //サンプル音を鳴らす高さ
 
 int SaveWithInitVolFile;	//曲データと…セーブするか。
 
-int preciselr = 0;
+extern bool preciselr;
 
 extern HINSTANCE hInst;//インスタンスハンドル
 extern void ClearEZC_Message(); //EZメッセージと範囲を消す
@@ -405,15 +405,15 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 			break;
 		case IDC_CHECK_PRECISELR:
 			i = preciselr;
-			if (IsDlgButtonChecked(hdwnd, IDC_CHECK_PRECISELR)) preciselr = 1;
-			else preciselr = 0;
+			if (IsDlgButtonChecked(hdwnd, IDC_CHECK_PRECISELR)) preciselr = true;
+			else preciselr = false;
 			if (preciselr != i) {
 				org_data.GetMusicInfo(&mi);
 
-				i = mi.repeat_x / (preciselr == 1 ? 1 : (mi.dot * mi.line));
+				i = mi.repeat_x / (preciselr ? 1 : (mi.dot * mi.line));
 				itoa(i, str, 10);
 				SetDlgItemText(hdwnd, IDD_REP_MEAS, str);
-				i = mi.end_x / (preciselr == 1 ? 1 : (mi.dot * mi.line));
+				i = mi.end_x / (preciselr ? 1 : (mi.dot * mi.line));
 				itoa(i, str, 10);
 				SetDlgItemText(hdwnd, IDD_END_MEAS, str);
 			}
