@@ -843,7 +843,7 @@ BEGIN
         MENUITEM "Save &As...\tCtrl+Shift+S",   IDM_SAVENEW
         MENUITEM SEPARATOR
         MENUITEM "Export",                      ID_EXPORT, INACTIVE
-        MENUITEM "  MIDI File (*.mid) (&M)...\tCtrl+Alt+M", IDM_EXPORT_MIDI
+        MENUITEM "  &MIDI File (*.mid)...\tCtrl+Alt+M", IDM_EXPORT_MIDI
         MENUITEM SEPARATOR
         MENUITEM "Recent Files",                ID_MENUITEM40135, INACTIVE
         MENUITEM "  1",                         IDM_RECENT1
@@ -1477,9 +1477,9 @@ BEGIN
     IDS_ERROR               "Error"
     IDS_MODIFIED            "File modified"
     IDS_DEFAULT_MIDI_TITLE  "Untitled Organya Symphony No. 1 1st Movement &#34;Yasagure Sanitizer&#34;"
-    IDS_STRING61            "Load (.org format)"
-    IDS_STRING62            "Save As (.org format)"
-    IDS_STRING63            "Export in standard MIDI format"
+    IDS_STRING61            "Load"
+    IDS_STRING62            "Save As"
+    IDS_STRING63            "Export As *.midi"
 END
 
 STRINGTABLE

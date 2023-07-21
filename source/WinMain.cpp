@@ -1473,7 +1473,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		ReleaseDC(hWnd,hdc);
 		break;
 */
-	default:return DefWindowProc(hwnd, message, wParam, lParam);//ˆÈŠO‚¾‚Á‚½‚ç
+	default: return DefWindowProc(hwnd, message, wParam, lParam);//ˆÈŠO‚¾‚Á‚½‚ç
 	}
 
 	return FALSE;
