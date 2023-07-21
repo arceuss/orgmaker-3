@@ -324,7 +324,8 @@ int freqbox[MAXTRACK] = {
 BOOL SetTrackFreq(HWND hdwnd, MUSICINFO *mi)
 {
 	char str[128] = {NULL};
-	unsigned short a;	
+	unsigned short a;
+	bool msg = false;
 	for(int i = 0; i < MAXMELODY; i++){
 		GetDlgItemText(hdwnd,freqbox[i],str,7);
 		a = (unsigned short)atol(str);
@@ -333,7 +334,8 @@ BOOL SetTrackFreq(HWND hdwnd, MUSICINFO *mi)
 //			MessageBox(hdwnd,"100Å`1900Ç…ê›íË","ERROR(é¸îgêî)",MB_OK);
 //			return FALSE;
 //		}
-		if(a < 100 || a > 1900){
+		if(!msg && (a < 100 || a > 1900)){
+			msg = true;
 			//MessageBox(hdwnd,"100Å`1900Ç…ê›íËÇµÇΩÇŸÇ§Ç™Ç¢Ç¢Ç≈Ç∑ÇÊÅB","Ç®ímÇÁÇπ(é¸îgêî)",MB_OK);	// 2014.10.19 D
 			msgbox(hdwnd,IDS_VALUESET1001900,IDS_INFO_TITLE_FREQ,MB_OK);	// 2014.10.19 A
 //			return FALSE;
