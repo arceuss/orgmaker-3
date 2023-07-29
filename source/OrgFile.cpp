@@ -93,7 +93,7 @@ BOOL OrgData::SaveMusicData(void)
 	}
 	//パスワード
 	j=2;
-	for(i=8;i<15;i++){
+	for(i=8;i<16;i++){ // iT JUST KEEPS GETTING WORSE !! WHY WAS IT < 15
 		if(org_data.tdata[i].wave_no>=12)j=3;	//ドラムの新しい音を使っていればVer.3
 	}
 	if(j==2)fwrite(&pass2[0], sizeof(char), 6, fp);
@@ -157,7 +157,7 @@ int OrgData::FileCheckBeforeLoad(char *checkfile)
 	fread(&pass_check[0], sizeof(char), 6, fp);
 	if( !memcmp( pass_check, pass, 6 ) )ver = 1;
 	if( !memcmp( pass_check, pass2, 6 ) )ver = 2;
-	if( !memcmp( pass_check, pass3, 6 ) )ver = 2;
+	if( !memcmp( pass_check, pass3, 6 ) )ver = 3;
 	if( !ver ){
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);
@@ -186,7 +186,7 @@ BOOL OrgData::LoadMusicData(void)
 	fread(&pass_check[0], sizeof(char), 6, fp);
 	if( !memcmp( pass_check, pass, 6 ) )ver = 1;
 	if( !memcmp( pass_check, pass2, 6 ) )ver = 2;
-	if( !memcmp( pass_check, pass3, 6 ) )ver = 2;
+	if( !memcmp( pass_check, pass3, 6 ) )ver = 3; // are you JOKING why was this 2
 	if( !ver ){
 		fclose(fp);
 		//MessageBox(hWnd,"このファイルは使えません","Error (Load)",MB_OK);	// 2014.10.19 D

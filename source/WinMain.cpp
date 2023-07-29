@@ -488,9 +488,18 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	return msg.wParam;//application ends here
 }
 
+LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
+	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "Organya Crash", MB_OK | MB_ICONERROR);
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
+#ifndef _DEBUG
+	SetUnhandledExceptionFilter(OrgCrashHandler);
+#endif
 //	char str[64];
 	int i, j;	// 2014.10.18 Added j
 	char res;
@@ -1106,7 +1115,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//Possible even while playing
 		switch(LOWORD(wParam)){
 		case IDM_LOUPE_MINUS:
-		case ID_AC_LOUPE_MINUS:
+		case ID_AC_LOUPE_MINUS: // i hate this whole codebase so much i want to redo everything
 			NoteWidth -= 2; if(NoteWidth<4)NoteWidth=4;
 			org_data.PutBackGround();
 			org_data.PutMusic();//View sheet music
@@ -1253,7 +1262,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	case WM_DESTROY://for post-processing
 		EndDirectSound();
 		org_data.ReleaseNote();
-		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE ¨ WM_DESTROY ¨ WM_QUIT.
+		DeleteWaveData100(); //Added 20140401 Normally, it seems to be called in the order of WM_CLOSE -> WM_DESTROY -> WM_QUIT.
 		EndGDI();
 		if(!hDlgPlayer)DestroyWindow(hDlgPlayer);
 		if(!hDlgTrack)DestroyWindow(hDlgTrack);

@@ -1477,9 +1477,9 @@ BEGIN
     IDS_ERROR               "Error"
     IDS_MODIFIED            "File modified"
     IDS_DEFAULT_MIDI_TITLE  "Untitled Organya Symphony No. 1 1st Movement &#34;Yasagure Sanitizer&#34;"
-    IDS_STRING61            "Load"
+    IDS_STRING61            "Open"
     IDS_STRING62            "Save As"
-    IDS_STRING63            "Export As *.midi"
+    IDS_STRING63            "MIDI Export"
 END
 
 STRINGTABLE
