@@ -34,12 +34,14 @@
 #define IDS_INFO_SAME_FILE              29
 #define IDS_INFO_TITLE_FREQ             30
 #define IDS_NOTIFY_EXIT                 31
+#define IDS_NOTIFY_UNSAVED              31
 #define IDS_NOTIFY_INITIALIZE           32
 #define IDS_NOTIFY_LOAD                 33
 #define IDS_NOTIFY_OVERWRITE            34
 #define IDS_NOTIFY_RECENT_INITIALIZE    35
 #define IDS_NOTIFY_TITLE                36
 #define IDS_NOTIFY_TITLE_EXIT           37
+#define IDS_NOTIFY_TITLE_UNSAVED        37
 #define IDS_NOTIFY_TITLE_INITALIZE      38
 #define IDS_NOTIFY_TITLE_LOAD           39
 #define IDS_SWAP_TRACK                  40
@@ -405,10 +407,11 @@
 #define IDC_ALL_SQUAREWAVE4             1213
 #define IDC_BTN2                        1213
 #define IDD_THEMES                      1213
-#define IDC_CHECK_PRECISELR             1214
-#define IDC_LEFTSTEP                    1215
-#define IDC_RIGHTSTEP                   1216
-#define IDC_END                         1217
+#define IDC_LEFTSTEP                    1214
+#define IDC_RIGHTSTEP                   1215
+#define IDC_END                         1216
+#define IDD_REP_BEAT                    1217
+#define IDD_END_BEAT                    1218
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -681,7 +684,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        239
 #define _APS_NEXT_COMMAND_VALUE         40292
-#define _APS_NEXT_CONTROL_VALUE         1218
+#define _APS_NEXT_CONTROL_VALUE         1219
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

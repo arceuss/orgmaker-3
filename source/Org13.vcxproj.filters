@@ -234,6 +234,15 @@
     <Image Include="Bitmap\button_track_I.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Bitmap\org_end.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Bitmap\org_next_step.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Bitmap\org_back_step.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="Wave\Bass01.wav">

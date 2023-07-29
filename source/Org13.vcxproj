@@ -204,8 +204,11 @@
     <Image Include="Bitmap\Note.bmp" />
     <Image Include="Bitmap\Number.bmp" />
     <Image Include="Bitmap\org_back.bmp" />
+    <Image Include="Bitmap\org_back_step.bmp" />
+    <Image Include="Bitmap\org_end.bmp" />
     <Image Include="Bitmap\org_home.bmp" />
     <Image Include="Bitmap\org_next.bmp" />
+    <Image Include="Bitmap\org_next_step.bmp" />
     <Image Include="Bitmap\org_play.bmp" />
     <Image Include="Bitmap\org_stop.bmp" />
     <Image Include="Bitmap\Pan.bmp" />

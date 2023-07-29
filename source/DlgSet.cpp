@@ -86,8 +86,6 @@ int SamplePlayHeight = 36; //サンプル音を鳴らす高さ
 
 int SaveWithInitVolFile;	//曲データと…セーブするか。
 
-extern bool preciselr;
-
 extern HINSTANCE hInst;//インスタンスハンドル
 extern void ClearEZC_Message(); //EZメッセージと範囲を消す
 extern void ReloadBitmaps();
@@ -193,13 +191,20 @@ void InitSettingDialog(HWND hdwnd)
 
 	SendDlgItemMessage(hdwnd,IDD_LB1,LB_SETCURSEL,i,0);
 	//リピート範囲の初期化//////////////////
-	CheckDlgButton(hdwnd, IDC_CHECK_PRECISELR, preciselr ? 1 : 0);
-	a = mi.repeat_x / (preciselr ? 1 : (mi.dot * mi.line));
+	//CheckDlgButton(hdwnd, IDC_CHECK_PRECISELR, preciselr ? 1 : 0);
+	a = mi.repeat_x / (mi.dot * mi.line);
 	itoa(a,str,10);
 	SetDlgItemText(hdwnd,IDD_REP_MEAS,str);
-	a = mi.end_x / (preciselr ? 1 : (mi.dot * mi.line));
+	a = mi.end_x / (mi.dot * mi.line);
 	itoa(a,str,10);
 	SetDlgItemText(hdwnd,IDD_END_MEAS,str);
+	// this one is better
+	a = mi.repeat_x % (mi.dot * mi.line);
+	itoa(a, str, 10);
+	SetDlgItemText(hdwnd, IDD_REP_BEAT, str);
+	a = mi.end_x % (mi.dot * mi.line);
+	itoa(a, str, 10);
+	SetDlgItemText(hdwnd, IDD_END_BEAT, str);
 	//の初期化//////////////////
 	a = mi.tdata[0].freq;
 	itoa(a,str,10);
@@ -290,10 +295,14 @@ BOOL SetRepeat(HWND hdwnd, MUSICINFO *mi)
 	long a,b;
 	GetDlgItemText(hdwnd,IDD_REP_MEAS,str,7);
 	a = atol(str);
-	mi->repeat_x = (unsigned short)a * (preciselr ? 1 : (mi->dot * mi->line));
-	GetDlgItemText(hdwnd,IDD_END_MEAS,str,7);
+	GetDlgItemText(hdwnd, IDD_REP_BEAT, str, 7);
 	b = atol(str);
-	mi->end_x = (unsigned short)b * (preciselr ? 1 : (mi->dot * mi->line));
+	mi->repeat_x = (unsigned short)a * (mi->dot * mi->line) + b;
+	GetDlgItemText(hdwnd,IDD_END_MEAS,str,7);
+	a = atol(str);
+	GetDlgItemText(hdwnd, IDD_END_BEAT, str, 7);
+	b = atol(str);
+	mi->end_x = (unsigned short)a * (mi->dot * mi->line) + b;
 	if(mi->end_x <= mi->repeat_x){
 		//MessageBox(hdwnd,"あたま＜おわり に設定してください","ERROR(リピート範囲)",MB_OK);	// 2014.10.19 D
 		msgbox(hdwnd,IDS_WARNING_FROM_TO,IDS_ERROR_REPERT,MB_OK);	// 2014.10.19 A
@@ -405,7 +414,7 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				}
 			}
 			break;
-		case IDC_CHECK_PRECISELR:
+		/*case IDC_CHECK_PRECISELR:
 			i = preciselr;
 			if (IsDlgButtonChecked(hdwnd, IDC_CHECK_PRECISELR)) preciselr = true;
 			else preciselr = false;
@@ -419,8 +428,8 @@ BOOL CALLBACK DialogSetting(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPar
 				itoa(i, str, 10);
 				SetDlgItemText(hdwnd, IDD_END_MEAS, str);
 			}
-			break;
-		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_SETWAIT: case IDC_BPM:
+			break;*/
+		case IDD_REP_MEAS: case IDD_END_MEAS: case IDD_REP_BEAT: case IDD_END_BEAT: case IDD_SETWAIT: case IDC_BPM:
 		case IDD_GRIDEDIT1: case IDD_GRIDEDIT2:
 		case IDD_SETFREQ0: case IDD_SETFREQ1: case IDD_SETFREQ2: case IDD_SETFREQ3: case IDD_SETFREQ4: case IDD_SETFREQ5: case IDD_SETFREQ6: case IDD_SETFREQ7:
 			if(HIWORD(wParam) == EN_SETFOCUS)PostMessage(GetDlgItem(hdwnd, LOWORD(wParam)), EM_SETSEL, 0, -1); //フォーカス時にテキストを全選択する

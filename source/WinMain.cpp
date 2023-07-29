@@ -72,7 +72,6 @@ BOOL actApp;
 bool gIsDrawing = false;
 bool gFileModified = false;
 bool gFileUnsaved = true;
-bool preciselr = false;
 
 long MAXHORZRANGE = MAXHORZMEAS * 16;
 
@@ -147,30 +146,55 @@ char *strMIDIFile;
 
 char *gSelectedTheme;
 
+bool OpenDoSave(HWND hwnd, bool savenew) {
+	char res;
+	if (savenew || gFileUnsaved) {
+		res = GetFileNameSave(hwnd, MessageString[IDS_STRING62]); //"Save As"
+		if (res == MSGCANCEL) return false;
+		if (res == MSGEXISFILE) {
+			//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
+			if (msgbox(hwnd, IDS_NOTIFY_OVERWRITE, IDS_INFO_SAME_FILE, MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
+				== IDNO) return false;
+		}
+	}
+	org_data.SaveMusicData();
+	SetModified(false);
+	gFileUnsaved = false;
+	return true;
+}
+
 int CancelDeleteCurrentData(int iMessagePattern = 1){
+	int res = -1;
 	if(iChangeFinish!=0){	// A 2010.09.22
 		if(gFileModified){
 			//Confirm the end when there is a change. // A 2010.09.22
-			if(iMessagePattern == 0){
+			/*if(iMessagePattern == 0){
 				//if(MessageBox(hWnd,"Any unsaved content will be discarded. Initialize?", "Initialization confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				if(msgbox(hWnd,IDS_NOTIFY_INITIALIZE, IDS_NOTIFY_TITLE_INITALIZE,MB_OKCANCEL | MB_ICONWARNING)==IDCANCEL)return 1;	// 2014.10.19 A
+				res = msgbox(hWnd,IDS_NOTIFY_INITIALIZE, IDS_NOTIFY_TITLE_INITALIZE,MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
 			}else if(iMessagePattern == 1){
 				//if(MessageBox(hWnd,"Any unsaved content will be discarded. Are you sure you want to quit?", "end confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				if(msgbox(hWnd,IDS_NOTIFY_EXIT, IDS_NOTIFY_TITLE_EXIT,MB_OKCANCEL | MB_ICONWARNING)==IDCANCEL)return 1;	// 2014.10.19 A
+				res = msgbox(hWnd,IDS_NOTIFY_EXIT, IDS_NOTIFY_TITLE_EXIT,MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
 			}else if(iMessagePattern == 2){
 				//if(MessageBox(hWnd,"Any unsaved content will be discarded. do you want to load the file?", "load confirmation",MB_OKCANCEL | MB_ICONASTERISK)==IDCANCEL)return 1;	// 2014.10.19 D
-				if(msgbox(hWnd,IDS_NOTIFY_LOAD, IDS_NOTIFY_TITLE_LOAD,MB_OKCANCEL | MB_ICONWARNING)==IDCANCEL)return 1;	// 2014.10.19 A
-			}
+				res = msgbox(hWnd,IDS_NOTIFY_LOAD, IDS_NOTIFY_TITLE_LOAD,MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
+			}*/
+			//res = msgbox(hWnd, IDS_NOTIFY_UNSAVED, IDS_NOTIFY_TITLE_UNSAVED, MB_YESNOCANCEL | MB_ICONWARNING);	// 2014.10.19 A
+			TCHAR strMesssage[2048];
+			wsprintf(strMesssage, MessageString[IDS_NOTIFY_UNSAVED], music_file);
+			res = MessageBox(hWnd, strMesssage, MessageString[IDS_NOTIFY_TITLE_UNSAVED], MB_YESNOCANCEL | MB_ICONWARNING);
+			if (res == -1) return 0;
+			if (res == IDCANCEL) return 1;
+			if (res == IDYES) return OpenDoSave(hWnd, false) ? 0 : 1;
 		}
 	} 
 	return 0;
 }
 
-void DetectPreciseMode() {
+/*void DetectPreciseMode() {
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi);
 	preciselr = (mi.repeat_x % (mi.line * mi.dot) != 0) || (mi.end_x % (mi.line * mi.dot) != 0);
-}
+}*/
 
 void InitBitmaps() {
 	InitBitmap("MUSIC", BMPMUSIC);//piano roll
@@ -446,7 +470,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 				if(org_data.LoadMusicData()==TRUE){ //C 2010.09.25 Judgment added
 					SetModified(false);//title name set
                     gFileUnsaved = false;
-					DetectPreciseMode();
+					//DetectPreciseMode();
 					org_data.GetMusicInfo( &mi );
 					SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 					SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
@@ -546,7 +570,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				org_data.LoadMusicData();
 				SetModified(false);//title name set
                 gFileUnsaved = false;
-				DetectPreciseMode();
+				//DetectPreciseMode();
 				org_data.GetMusicInfo( &mi );
 				SetDlgItemInt(hDlgTrack,IDE_VIEWWAIT,mi.wait,TRUE );
 				SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
@@ -635,22 +659,12 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				break;
 			case IDM_SAVEOVER:
 			case ID_AC_MENUOVERSAVE:
-                if (gFileUnsaved) {
-                    res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
-                    if(res == MSGCANCEL)break;
-                    if(res == MSGEXISFILE){
-                        //if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
-                        if(msgbox(hwnd,IDS_NOTIFY_OVERWRITE,IDS_INFO_SAME_FILE,MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 A
-                            ==IDNO)break;
-                    }
-                }
-				org_data.SaveMusicData();
-				SetModified(false);
-                gFileUnsaved = false;
+				OpenDoSave(hwnd, false);
 				break;							  
 			case IDM_SAVENEW://Save As
 			case ID_AC_MENUNEWSAVE:
-				res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
+				OpenDoSave(hwnd, true);
+				/*res = GetFileNameSave(hwnd,MessageString[IDS_STRING62]); //"Save As"
 				if(res == MSGCANCEL)break;
 				if(res == MSGEXISFILE){
 					//if(MessageBox(hwnd,"Do you want to overwrite?","There is a file with the same name",MB_YESNO | MB_ICONEXCLAMATION)	// 2014.10.19 D
@@ -659,7 +673,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				}
 				org_data.SaveMusicData();
 				SetModified(false);//title name set
-                gFileUnsaved = false;
+                gFileUnsaved = false;*/
 				break;
 			case IDM_EXPORT_MIDI: //Export 2014.05.11
 			case ID_AC_MIDI:
@@ -691,7 +705,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				org_data.LoadMusicData();
 				SetModified(false);//title name set
                 gFileUnsaved = false;
-				DetectPreciseMode();
+				//DetectPreciseMode();
 
 				//Show to Player
 				org_data.GetMusicInfo( &mi );
@@ -1215,7 +1229,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		org_data.InitOrgData();
 		org_data.LoadMusicData();
 		org_data.PutMusic();//View sheet music
-		DetectPreciseMode();
+		//DetectPreciseMode();
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 		//Show to Player
 		org_data.GetMusicInfo( &mi );

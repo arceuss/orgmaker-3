@@ -75,15 +75,15 @@ BEGIN
     PUSHBUTTON      ">",IDC_BTN2,75,12,11,12,0,WS_EX_STATICEDGE
     RTEXT           "&BPM",IDC_STATIC,92,13,22,10
     EDITTEXT        IDC_BPM,116,12,22,12,ES_AUTOHSCROLL | ES_NUMBER
-    GROUPBOX        "Loop &Range",IDC_STATIC,4,53,68,55
-    LTEXT           "Precise", IDC_STATIC, 28, 67, 26, 8
-    CONTROL         "", IDC_CHECK_PRECISELR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 18, 67, 8, 8
-    LTEXT           "Start",IDC_STATIC,18,80,20,8
-    EDITTEXT        IDD_REP_MEAS,40,78,26,12,ES_NUMBER
-    LTEXT           "End",IDC_STATIC,18,93,20,8
-    EDITTEXT        IDD_END_MEAS,40,91,26,12,ES_NUMBER
-    GROUPBOX        "Display &Grid",IDC_STATIC,4,112,68,107
-    LISTBOX         IDD_LB1,10,123,58,65,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Repeat &Range",IDC_STATIC,4,53,68,42
+    LTEXT           "Start",IDC_STATIC,13,67,20,8
+    EDITTEXT        IDD_REP_MEAS,35,65,16,12,ES_NUMBER
+    EDITTEXT        IDD_REP_BEAT,53,65,12,12,ES_NUMBER
+    LTEXT           "End",IDC_STATIC,13,80,20,8
+    EDITTEXT        IDD_END_MEAS,35,79,16,12,ES_NUMBER
+    EDITTEXT        IDD_END_BEAT,53,79,12,12,ES_NUMBER
+    GROUPBOX        "Display &Grid",IDC_STATIC,4,99,68,120
+    LISTBOX         IDD_LB1,10,110,58,78,LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Custom",IDC_STATIC,7,191,40,8
     EDITTEXT        IDD_GRIDEDIT1,7,202,15,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Beat",IDC_STATIC,23,205,15,8
@@ -286,16 +286,16 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,60,84,36,14
     LTEXT           "Track",IDC_STATIC,8,12,16,8
     LTEXT           "Meas",IDC_STATIC,28,12,16,8
-    LTEXT           "Beat",IDC_STATIC,48,12,16,8
+    LTEXT           "Step",IDC_STATIC,48,12,16,8
     LTEXT           "Meas",IDC_STATIC,72,12,16,8
-    LTEXT           "Beat",IDC_STATIC,94,12,16,8
+    LTEXT           "Step",IDC_STATIC,94,12,16,8
     LTEXT           "~",IDC_STATIC,62,25,8,12
     LTEXT           "Times",IDC_STATIC,72,65,15,8
     GROUPBOX        "From",IDC_STATIC,4,0,110,41
     GROUPBOX        "To",IDC_STATIC,4,44,64,37
     LTEXT           "Track",IDC_STATIC,9,53,16,8
     LTEXT           "Meas",IDC_STATIC,29,53,16,8
-    LTEXT           "Beat",IDC_STATIC,49,53,16,8
+    LTEXT           "Step",IDC_STATIC,49,53,16,8
     LTEXT           ":",IDC_STATIC,20,25,8,12
     LTEXT           ":",IDC_STATIC,21,67,8,12
 END
@@ -315,7 +315,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,44,64,32,14
     LTEXT           "Track",IDC_STATIC,8,4,16,8
     LTEXT           "From",Meas,36,4,16,8
-    LTEXT           "to",IDC_STATIC,64,4,8,8
+    LTEXT           "To",IDC_STATIC,64,4,8,8
     LTEXT           "~",IDC_STATIC,56,16,8,12
     LTEXT           ":",IDC_STATIC,24,16,8,12
     LTEXT           "Value",IDC_STATIC,9,32,8,8
@@ -337,7 +337,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,44,64,32,14
     LTEXT           "Track",IDC_STATIC,8,4,16,8
     LTEXT           "From",Meas,36,4,16,8
-    LTEXT           "to",IDC_STATIC,64,4,8,8
+    LTEXT           "To",IDC_STATIC,64,4,8,8
     LTEXT           "~",IDC_STATIC,56,16,8,12
     LTEXT           ":",IDC_STATIC,24,16,8,12
     LTEXT           "Value",IDC_STATIC,8,33,8,8
@@ -358,8 +358,8 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,64,32,14
     PUSHBUTTON      "Cancel",IDCANCEL,44,64,32,14
     LTEXT           "Track",IDC_STATIC,8,4,16,8
-    LTEXT           "Meas",Meas,36,4,16,8
-    LTEXT           "Meas",IDC_STATIC,64,4,8,8
+    LTEXT           "From",Meas,36,4,16,8
+    LTEXT           "To",IDC_STATIC,64,4,8,8
     LTEXT           "~",IDC_STATIC,56,16,8,12
     LTEXT           ":",IDC_STATIC,24,16,8,12
     LTEXT           "Value",IDC_STATIC,8,34,8,8
@@ -444,7 +444,7 @@ END
 
 DLGCOPY2 DIALOGEX 0, 0, 175, 145
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Bulk Copy"
+CAPTION "Multi-Copy"
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDE_MEAS1_1,88,36,16,12,ES_NUMBER
@@ -458,16 +458,16 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,129,108,36,18
     LTEXT           "Melody",IDC_STATIC,12,12,24,8
     LTEXT           "Meas",IDC_STATIC,88,24,16,8
-    LTEXT           "Beat",IDC_STATIC,108,24,16,8
+    LTEXT           "Step",IDC_STATIC,108,24,16,8
     LTEXT           "Meas",IDC_STATIC,128,24,16,8
-    LTEXT           "Beat",IDC_STATIC,148,24,16,8
+    LTEXT           "Step",IDC_STATIC,148,24,16,8
     LTEXT           "~",IDC_STATIC,120,40,8,8
     LTEXT           "Times",IDC_STATIC,132,78,15,8
     GROUPBOX        "From",IDC_STATIC,84,11,84,41
     GROUPBOX        "To",IDC_STATIC,84,56,44,42
     LTEXT           "Drums",IDC_STATIC,44,12,20,8
     LTEXT           "Meas",IDC_STATIC,87,67,16,8
-    LTEXT           "Beat",IDC_STATIC,106,67,16,8
+    LTEXT           "Step",IDC_STATIC,106,67,16,8
     CONTROL         "Tr 1",IDC_USE0,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,24,29,10
     CONTROL         "Tr 2",IDC_USE1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,36,29,10
     CONTROL         "Tr 3",IDC_USE2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,48,29,10
@@ -876,7 +876,7 @@ BEGIN
         MENUITEM "&Deselect\tCtrl+D",           IDM_SELECT_RESET
         MENUITEM SEPARATOR
         MENUITEM "&Copy...\tCtrl+F2",           IDM_DLGCOPY
-        MENUITEM "&Bulk Copy...\tCtrl+F3",      IDM_DLGCOPY2
+        MENUITEM "&Multi-Copy...\tCtrl+F3",     IDM_DLGCOPY2
         MENUITEM SEPARATOR
         MENUITEM "&Pan...\tCtrl+F4",            IDM_DLGPAN
         MENUITEM "&Volume...\tF4",              IDM_DLGVOL
@@ -979,7 +979,7 @@ BEGIN
         MENUITEM "  Extend &Note Heads",        IDM_NOTE_ENLARGE
         MENUITEM "  Show &All Tracks\tCtrl+F9", IDM_DRAWDOUBLE
         MENUITEM "  Slide Overlapping Notes\tShift+F9", IDM_SLIDEOVERLAPNOTES
-        MENUITEM "  &Playback Smooth Scrolling",IDM_SMOOTHSCROLL
+        MENUITEM "  &Playback Smooth Scrolling", IDM_SMOOTHSCROLL
         MENUITEM SEPARATOR
         MENUITEM "Window Dialog",               IDM_DUMMY, INACTIVE
         MENUITEM "  Toggle &Edit Toolbar\tF9",  IDM_EZCOPYVISIBLE
@@ -1438,18 +1438,18 @@ BEGIN
     IDS_INFO_NARABEKAE      "Rearranged and restructured."
     IDS_INFO_SAME_FILE      "File Already Exists"
     IDS_INFO_TITLE_FREQ     "Notice (Frequency)"
-    IDS_NOTIFY_EXIT         "Any unsaved changes will be lost. Are you sure you want to exit?"
+    IDS_NOTIFY_UNSAVED      "Do you want to save changes to %s?"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_NOTIFY_INITIALIZE   "Any unsaved changes will be lost. Are you sure you want to initialize?"
-    IDS_NOTIFY_LOAD         "Any unsaved changes will be lost. Are you sure you want to load?"
+    IDS_NOTIFY_INITIALIZE   "Do you want to save changes to %s?"
+    IDS_NOTIFY_LOAD         "Do you want to save changes to %s?"
     IDS_NOTIFY_OVERWRITE    "Overwrite?"
     IDS_NOTIFY_RECENT_INITIALIZE 
                             "Are you sure you want to clear your Recent Files list?"
     IDS_NOTIFY_TITLE        "Notice"
-    IDS_NOTIFY_TITLE_EXIT   "Unsaved Changes"
+    IDS_NOTIFY_TITLE_UNSAVED "Unsaved Changes"
     IDS_NOTIFY_TITLE_INITALIZE "Unsaved Changes"
     IDS_NOTIFY_TITLE_LOAD   "Unsaved Changes"
     IDS_SWAP_TRACK          "Replaced the designated Track."
@@ -1508,7 +1508,7 @@ BEGIN
     IDS_STRING81            "Save as .org format"
     IDS_STRING82            "Goodbye!"
     IDS_STRING83            "Waveform and frequency can be selected."
-    IDS_STRING84            "You can select the tempo, loop range, beat, and frequency of the song."
+    IDS_STRING84            "You can select the tempo, repeat range, beat, and frequency of the song."
     IDS_STRING85            "Pan and Vol default values can be set for each track."
     IDS_STRING86            "Manipulates the Vol of each existing note in the selected range."
     IDS_STRING87            "Add a dummy note for the length of the note in the selection."
