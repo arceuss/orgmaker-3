@@ -29,6 +29,8 @@ long StartNotex = -99999;	//そのノート
 
 long PutStartX = -99999;	//音符のドラッグ開始点
 
+int keyDrag = -99999;
+
 extern char TrackN[];
 extern int sGrid;	//範囲選択はグリッド単位で
 extern int MinimumGrid(int x);
@@ -113,13 +115,22 @@ void SelectAll(int FullTrack)
 
 void LButtonUP(WPARAM wParam, LPARAM lParam)
 {
+	long scr_h, scr_v;
 	RECT rect = {64,0,WWidth,WHeight};
+	RECT rectALL = { 0,0,WWidth,WHeight };
 	if(PutStartX != -99999){
 		org_data.CheckNoteTail(org_data.track);
 		PutStartX = -99999;
 		org_data.PutMusic();//楽譜の再描画
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
+	}
+	if (keyDrag != -99999) {
+		scr_data.GetScrollPosition(&scr_h, &scr_v);
+		org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
+		org_data.PutMusic();//Redrawing sheet music
+		RedrawWindow(hWnd, &rectALL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
+		keyDrag = -99999;
 	}
 	if(DragStartx<=-99999)return;
 
@@ -150,6 +161,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 	RECT rect2 = {64,0,WWidth,WHeight};
 	RECT rectPAN = {64, WHeight+292-WHNM - 3, WWidth, WHeight+(351+7)-WHNM + 3};	// 2010.08.14 
 	RECT rectVOL = {64, WHeight+365-WHNM - 3, WWidth, WHeight+428-WHNM + 3};	// 2010.08.14 
+	RECT rectALL = { 0,0,WWidth,WHeight };
 
 	if(timer_sw)return;
 	long mouse_x;
@@ -171,9 +183,23 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 	Ry = -12*(Last_mouse_y - 95 + scr_v);	// 2010.08.14 
 	RECT rectNOTE = {64, Ry, WWidth, Ry + 12};	//現在の音符付近のみ	// 2010.08.14 
 
+	unsigned char newn;
+
 	if(DragStartx<=-99999){
 		if(wParam & MK_LBUTTON){
-
+			if (keyDrag > -99999) {
+				//		if(mouse_x >= 0 && mouse_y >= 0 && mouse_y < 288+WDWHEIGHTPLUS){//鍵盤
+				if (mouse_x >= 0 && mouse_y >= 0 && mouse_y < WHeight + 288 - WHNM) {//鍵盤
+					newn = unsigned char(95 - (mouse_y / 12 + scr_v));
+					if (keyDrag != newn) {
+						org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
+						org_data.TouchKeyboard(newn);//96*12は楽譜の縦サイズ
+						org_data.PutMusic();//Redrawing sheet music
+						RedrawWindow(hWnd, &rectALL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
+					}
+					keyDrag = newn;
+				}
+			}
 			//if(PutStartX>-99999+1){ //音符ドラッグ 2010.09.23 D
 			if(PutStartX>-99999+1 && ( 95 - (mouse_y/12 + scr_v)!=Last_mouse_y || (mouse_x - KEYWIDTH)/NoteWidth + scr_h != Last_mouse_x)){ //音符ドラッグ //2010.09.23 A
 				if(ptx < PutStartX){	// 2010.08.14 C
@@ -309,6 +335,7 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 void ClickProcL(WPARAM wParam, LPARAM lParam)
 {
 	RECT rect = {64,0,WWidth,WHeight};
+	RECT rectALL = { 0,0,WWidth,WHeight };
 	long mouse_x;
 	long mouse_y;
 	long scr_h,scr_v;
@@ -323,6 +350,7 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 	line = mi.line;
 	PutStartX = -99999;
 	Last_VOL_Drag_mouse_x = -99999;
+	keyDrag = -99999;
 	alt_down = (GetKeyState(VK_MENU)<0)? 1: ((GetKeyState(VK_APPS)<0)? 2: 0) ;
 	shift_down = (GetKeyState(VK_TAB)<0)? 1: 0;
 
@@ -337,7 +365,11 @@ void ClickProcL(WPARAM wParam, LPARAM lParam)
 	if(mouse_x < 64){
 //		if(mouse_x >= 0 && mouse_y >= 0 && mouse_y < 288+WDWHEIGHTPLUS){//鍵盤
 		if(mouse_x >= 0 && mouse_y >= 0 && mouse_y < WHeight+288-WHNM){//鍵盤
-			org_data.TouchKeyboard(unsigned char(95 - (mouse_y/12 + scr_v)));//96*12は楽譜の縦サイズ
+			//org_data.TouchKeyboard(unsigned char(95 - (mouse_y/12 + scr_v)));//96*12は楽譜の縦サイズ
+			keyDrag = unsigned char(95 - (mouse_y / 12 + scr_v));
+			org_data.TouchKeyboard(keyDrag);//96*12は楽譜の縦サイズ
+			org_data.PutMusic();//Redrawing sheet music
+			RedrawWindow(hWnd, &rectALL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
 		}
 		if(mouse_x >= 0 && mouse_y >= WHeight+288-WHNM+144 && mouse_y < WHeight+288-WHNM+144+16){//Selectの部位 2014.05.01
 			ChangeSelAlwaysCurrent();

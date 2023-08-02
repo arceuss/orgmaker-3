@@ -164,7 +164,7 @@ bool OpenDoSave(HWND hwnd, bool savenew) {
 }
 
 int CancelDeleteCurrentData(int iMessagePattern = 1){
-	int res = -1;
+	int res;
 	if(iChangeFinish!=0){	// A 2010.09.22
 		if(gFileModified){
 			//Confirm the end when there is a change. // A 2010.09.22
@@ -182,7 +182,6 @@ int CancelDeleteCurrentData(int iMessagePattern = 1){
 			TCHAR strMesssage[2048];
 			wsprintf(strMesssage, MessageString[IDS_NOTIFY_UNSAVED], music_file);
 			res = MessageBox(hWnd, strMesssage, MessageString[IDS_NOTIFY_TITLE_UNSAVED], MB_YESNOCANCEL | MB_ICONWARNING);
-			if (res == -1) return 0;
 			if (res == IDCANCEL) return 1;
 			if (res == IDYES) return OpenDoSave(hWnd, false) ? 0 : 1;
 		}

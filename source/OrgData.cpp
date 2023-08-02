@@ -14,6 +14,7 @@
 #define DEFPAN		6
 extern HWND hDlgTrack;
 extern char *dram_name[];
+extern int iKeyPushDown[];
 //指定の数だけNoteDataの領域を確保(初期化)
 BOOL OrgData::NoteAlloc(unsigned short alloc)
 {
@@ -134,7 +135,13 @@ NOTELIST *OrgData::SearchNote(NOTELIST *np)
 //音符を配置(左クリックの処理)
 void OrgData::TouchKeyboard(unsigned char y)
 {
-	PlayOrganKey(y,track,info.tdata[track].freq,320);//■
+	Rxo_PlayKey(y,track,info.tdata[track].freq,0);
+	iKeyPushDown[y] = 1;
+}
+void OrgData::StopKeyboard(unsigned char y)
+{
+	Rxo_StopKey(y,track,0);
+	iKeyPushDown[y] = 0;
 }
 BOOL OrgData::SetNote(long x,unsigned char y, int DragMode)
 {

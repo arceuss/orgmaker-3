@@ -65,8 +65,8 @@ CURSOR                  CURSOR                  "bitmap\\cursor.cur"
 
 DLGSETTING DIALOGEX 0, 0, 151, 223
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Song Properties"
 FONT 9, "MS PGothic", 0, 0, 0x1
+CAPTION "Song Properties"
 BEGIN
     GROUPBOX        "&Tempo",IDC_STATIC,4,1,140,46
     RTEXT           "&Wait",IDC_STATIC,8,13,29,10

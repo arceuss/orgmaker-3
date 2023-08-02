@@ -319,7 +319,8 @@ void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 	for(int j = 0; j < 8; j++)
 		for(int i = 0; i < 2; i++){
 			tmpDouble = (((double)oct_wave[j].wave_size * freq_tbl[key])*(double)oct_wave[j].oct_par)/8.00f + ((double)a - 1000.0f);
-			
+			//dmmult = (0.98f + ((double)a / 50000.0f));
+			//tmpDouble = (((double)oct_wave[j].wave_size * freq_tbl[key]) * (double)oct_wave[j].oct_par) / (8.00f * (2.0f - dmmult));
 			
 			lpORGANBUFFER[track][j][i]->SetFrequency(//1000‚ð+ƒ¿‚ÌƒfƒtƒHƒ‹ƒg’l‚Æ‚·‚é
 				(DWORD)tmpDouble
@@ -642,6 +643,7 @@ void PlayDramObject(unsigned char key, int mode,char track)
 		}
     }
 }
+
 void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 {
 	if(key>96)return;
@@ -649,6 +651,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 		DWORD wait = timeGetTime();
 		ChangeOrganFrequency(key%12,track,freq);//Žü”g”‚ðÝ’è‚µ‚Ä
 		lpORGANBUFFER[track][key/12][0]->SetVolume((160-255)*8);
+		lpORGANBUFFER[track][key/12][0]->SetPan(0);
 		lpORGANBUFFER[track][key/12][0]->Play(0, 0, DSBPLAY_LOOPING);
 		do{
 		}while(timeGetTime() < wait + (DWORD)Nagasa);
@@ -659,6 +662,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 		lpDRAMBUFFER[track - MAXMELODY]->SetCurrentPosition(0);
 		ChangeDramFrequency(key,track - MAXMELODY);//Žü”g”‚ðÝ’è‚µ‚Ä
 		lpDRAMBUFFER[track - MAXMELODY]->SetVolume((160-255)*8);
+		lpDRAMBUFFER[track - MAXMELODY]->SetPan(0);
 		lpDRAMBUFFER[track - MAXMELODY]->Play(0, 0, 0);
 	}
 }
@@ -671,12 +675,14 @@ void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 	if(track < MAXMELODY){
 		ChangeOrganFrequency(key%12,track,freq);
 		lpORGANBUFFER[track][key/12][Phase]->SetVolume((160-255)*8);
+		lpORGANBUFFER[track][key/12][Phase]->SetPan(0);
 		lpORGANBUFFER[track][key/12][Phase]->Play(0, 0, DSBPLAY_LOOPING);
 	}else{
 		lpDRAMBUFFER[track - MAXMELODY]->Stop();
 		lpDRAMBUFFER[track - MAXMELODY]->SetCurrentPosition(0);
 		ChangeDramFrequency(key,track - MAXMELODY);//Žü”g”‚ðÝ’è‚µ‚Ä
 		lpDRAMBUFFER[track - MAXMELODY]->SetVolume((160-255)*8);
+		lpDRAMBUFFER[track - MAXMELODY]->SetPan(0);
 		lpDRAMBUFFER[track - MAXMELODY]->Play(0, 0, 0);
 	}
 }

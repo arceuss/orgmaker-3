@@ -83,6 +83,7 @@ typedef struct OrgData{
 		void ReleaseNote(void);//NoteDataを開放
 		NOTELIST *SearchNote(NOTELIST *np);//未使用NOTEの検索
 		void OrgData::TouchKeyboard(unsigned char y);//鍵盤に触れる
+		void OrgData::StopKeyboard(unsigned char y);//鍵盤に触れる
 		BOOL SetNote(long x,unsigned char y, int DragMode = 0);//音符を配置
 		BOOL CutNote(long x,unsigned char y);//音符のカット
 		BOOL SetPan(long x,unsigned char y);//パン音符を配置
