@@ -259,7 +259,7 @@ Organya 3   Ver3.0.4   Simple Help
 # Revision History 
 
   3.0.4  2023/08/03  Removed "Precise" checkbox from repeat range and replaced it
-                       with a seperate step textbox
+                       with a separate step textbox
                      Exiting with unsaved changes will now ask you and let you
                        save the file
                      Maximum song length is now 999 measures
