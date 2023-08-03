@@ -259,7 +259,7 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 {//ファイル名を取得(ロード)
 	OPENFILENAME ofn;
-	FILE *fp;
+	//FILE *fp;
 	char mfile[MAX_PATH];
 //	char res;//ファイルオープンの結果
 
@@ -289,13 +289,11 @@ char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 	//ファイル名取得を試みる。
 	if(GetOpenFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
 	else return MSGCANCEL;//キャンセルで0が返る
-	fp = fopen(mfile,"rb");
-	if(fp == NULL){
+	if(org_data.FileCheckBeforeLoad(mfile)){
 		//MessageBox(hwnd,"ファイルにアクセスできません","",MB_OK);	// 2014.10.19 D
-		msgbox(hwnd,IDS_WARNING_ACCESS_FILE,IDS_ERROR,MB_OK);	// 2014.10.19 A
+		msgbox(hwnd, IDS_STRING64, IDS_ERROR_LOAD, MB_OK | MB_ICONWARNING); // 2014.10.19 A
 		return MSGCANCEL;//指定ファイルが存在しない
 	}
-	fclose(fp);
 	strcpy(music_file, mfile);
 
 	return MSGLOADOK;

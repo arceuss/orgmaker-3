@@ -238,21 +238,22 @@ void CreateMenuRecent()
 void SaveRecentFilesToInifile()
 {
 	int i;
-	for(i=0;i<10;i++){
+	for (i = 0; i < 10; i++) {
 		WritePrivateProfileString("Recent",FileAcc[i],RecentFileName[i],app_path);
 	}
 }
 
-void SetLoadRecentFile(int iNum)
+bool SetLoadRecentFile(int iNum)
 {
-	if(iNum<0 || iNum>9)return;
+	if (iNum < 0 || iNum > 9) return false;
+	if (org_data.FileCheckBeforeLoad(RecentFileName[iNum])) return false;
 	strcpy(music_file, RecentFileName[iNum]);
-
+	return true;
 }
 
 int GetSelectMeasBeat(int GetToValue, int addValue)
 {
-	if (tra<0)return 0;
+	if (tra < 0) return 0;
 	int r,g;	//line ‰½”‘‚©  // dot ‚P”‘‚Ì•ªŠ„”
 	unsigned char line,dot;
 	MUSICINFO mi;	org_data.GetMusicInfo(&mi);

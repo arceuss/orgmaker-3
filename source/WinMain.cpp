@@ -454,7 +454,28 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		int ggg = strlen(gfn)-ttt;
 		gfn[ggg]=0;
 		//MessageBox(hWnd,gfn,"Error(Load)",MB_OK);
-		fp=fopen(gfn,"rb");
+
+		if (org_data.FileCheckBeforeLoad(gfn)) { //A 2010.09.25 If the file is in Org format
+			strcpy(music_file, gfn);
+			if (org_data.LoadMusicData() == TRUE) { //C 2010.09.25 Judgment added
+				SetModified(false);//title name set
+				gFileUnsaved = false;
+				//DetectPreciseMode();
+				org_data.GetMusicInfo(&mi);
+				SetDlgItemInt(hDlgTrack, IDE_VIEWWAIT, mi.wait, TRUE);
+				SetDlgItemText(hDlgTrack, IDE_VIEWTRACK, "1");
+				ClearEZC_Message();
+				SelectReset();
+				org_data.PutMusic();
+			}
+			else {
+				//Because it was not an ORG format file //A 2010.9.25
+				//File name clear
+				strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
+			}
+		}
+
+		/*fp=fopen(gfn,"rb");
 		if(fp==NULL){
 			//MessageBox(hWnd,"Failed to read","Error(Load)",MB_OK); //D 2010.09.28
 		}else{
@@ -482,7 +503,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 					strcpy(music_file, MessageString[IDS_DEFAULT_ORG_FILENAME]);
 				}
 			}
-		}
+		}*/
 	}
 	QuitMMTimer(); //A 2010.09.21
 	//Generate message loop (main loop)
@@ -562,8 +583,11 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		for(i=0;i<10;i++){	//recently used files
 			if(LOWORD(wParam)==Menu_Recent[i]){
-				if(CancelDeleteCurrentData(CDCD_LOAD))break;
-				SetLoadRecentFile(i);
+				if (CancelDeleteCurrentData(CDCD_LOAD)) break;
+				if (!SetLoadRecentFile(i)) {
+					msgbox(hWnd, IDS_STRING64, IDS_ERROR_LOAD, MB_OK | MB_ICONWARNING);
+					break;
+				}
 				ClearUndo(); // 2023.06.10 Someone forgot to put this here
 				org_data.InitOrgData();
 				org_data.LoadMusicData();
@@ -698,7 +722,6 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				/*i = 0;
 				if(LOWORD(wParam)==IDM_LOAD2 || LOWORD(wParam)==ID_AC_LOAD2)i=1; */
 				if(GetFileNameLoad(hWnd,MessageString[IDS_STRING61]/*,i*/) != MSGLOADOK) break;//"Load song data"
-				
 				ClearUndo();
 				org_data.InitOrgData();
 				org_data.LoadMusicData();
@@ -1218,7 +1241,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		//DragQueryFile((HDROP)wParam,0,music_file,MAX_PATH);	// 2014.05.22 D
 		DragQueryFile((HDROP)wParam,0,strMIDIFile,MAX_PATH);	// 2014.05.22 A
 		if(org_data.FileCheckBeforeLoad(strMIDIFile)){
-			SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING64]); //<!>The file cannot be opened or is in an invalid format.
+			msgbox(hwnd, IDS_STRING64, IDS_ERROR_LOAD, MB_OK | MB_ICONWARNING);
+			//SetDlgItemText(hDlgEZCopy, IDC_MESSAGE, MessageString[IDS_STRING64]); // The file cannot be opened or is in an invalid format.
 			break;
 		}
 		strcpy(music_file, strMIDIFile);

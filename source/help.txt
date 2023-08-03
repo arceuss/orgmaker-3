@@ -1,4 +1,4 @@
-Organya 3   Ver3.0.3   Simple Help
+Organya 3   Ver3.0.4   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   Basic usage is the same as "Organya 1" developed by Mr. Pixel.
@@ -258,6 +258,16 @@ Organya 3   Ver3.0.3   Simple Help
 
 # Revision History 
 
+  3.0.4  2023/08/03  Removed "Precise" checkbox from repeat range and replaced it
+                       with a seperate step textbox
+                     Exiting with unsaved changes will now ask you and let you
+                       save the file
+                     Maximum song length is now 999 measures
+                     Improved note testing function (clicking on the piano keyboard)
+                     Improved workaround for smooth scrolling slowing down faster
+                       songs
+                     Even more tweaks and small bug fixes
+
   3.0.3  2023/07/15  Updated some low quality strings
                      Automatically detect loop precise mode on song load
                      Added "to end" button and re-arranged player dialog
@@ -268,13 +278,19 @@ Organya 3   Ver3.0.3   Simple Help
   3.0.1  2023/06/28  Fixed incorrect save for some options
                      Fixed option bug with TAB & SHIFT key
 
-  3.0.0  2023/06/28  Added smoother horizontal scrolling (per note instead of per measure)
+  3.0.0  2023/06/28  Added smoother horizontal scrolling (per note instead
+                       of per measure)
                      Added metronome option
                      Added custom theme support
-                     Added support for more precise loop regions (per note instead of per measure)
+                     Added support for more precise loop regions (per note
+                       instead of per measure)
                      Fixed "crash" bug when zooming/scrolling while playing song
                      Very many bug fixes
                      Some small tweaks to scrolling
+
+  2.1.1  2014/10/19  Bug fix when selecting number 0 of the recently used files
+                     Use String Table for messages to be displayed (halfway)
+                     Other minor corrections
 
   2.1.0  2014/05/31  Added Insert and Remove functions
                      Added Export to Standard MIDI Format function
@@ -442,9 +458,9 @@ Please understand that there is no malice in the production.
   Erase the note by right-clicking.
   In case of long note, the note will shrink.
 
-@ Changing the pan pot
+@ Changing the pan
 
-  When you left-click pan line you can put a pan pot symbol.
+  When you left-click pan line you can put a pan symbol.
 
 @ Changing the volume
 
@@ -509,7 +525,7 @@ such can be changed.
 
 @ Pan
 
-  Move the pan pot by the specified range.
+  Move the pan by the specified range.
   "Value" How much. "Add/subtract" If "up" moves right, if "down" moves left.
 
 @ Volume

@@ -65,8 +65,8 @@ CURSOR                  CURSOR                  "bitmap\\cursor.cur"
 
 DLGSETTING DIALOGEX 0, 0, 151, 223
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-FONT 9, "MS PGothic", 0, 0, 0x1
 CAPTION "Song Properties"
+FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
     GROUPBOX        "&Tempo",IDC_STATIC,4,1,140,46
     RTEXT           "&Wait",IDC_STATIC,8,13,29,10
@@ -434,8 +434,8 @@ CAPTION "About Organya"
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,113,40,18
-    CTEXT           "Organya ver.3.0.3",IDC_STATIC,20,32,80,8
-    LTEXT           "2023 / 07 / 15",IDC_STATIC,37,43,44,8
+    CTEXT           "Organya ver.3.0.4",IDC_STATIC,20,32,80,8
+    LTEXT           "2023 / 08 / 03",IDC_STATIC,37,43,44,8
     CTEXT           "Organya 1 by Studio Pixel",IDC_STATIC,2,57,114,16,SS_CENTERIMAGE | SS_SUNKEN
     ICON            "ICON",ID_ICON_ORG,49,3,20,20,SS_NOTIFY,WS_EX_DLGMODALFRAME
     CTEXT           "Organya 2 by Rxo Inverse",IDC_STATIC,2,75,114,16,SS_CENTERIMAGE | SS_SUNKEN
@@ -626,7 +626,7 @@ BEGIN
     CTEXT           "<->",IDC_STATIC,21,19,10,9
 END
 
-IDD_MIDI DIALOGEX 0, 0, 285, 274
+IDD_MIDI DIALOGEX 0, 0, 285, 283
 STYLE DS_SETFONT | DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
@@ -636,28 +636,28 @@ BEGIN
     EDITTEXT        IDC_TITLE,66,134,184,12,ES_AUTOHSCROLL
     LTEXT           "&Copyright Notice:",IDC_STATIC,7,151,52,10
     EDITTEXT        IDC_AUTHOR,66,149,181,12,ES_AUTOHSCROLL
-    LTEXT           "Please write the letter (C), the year of publication, and the name of the copyright holder.",IDC_STATIC,66,164,205,10
-    PUSHBUTTON      "Set all to 1",IDC_ALL_SQUAREWAVE1,11,185,61,14,0,WS_EX_STATICEDGE
-    PUSHBUTTON      "All [16:Organ]",IDC_ALL_SQUAREWAVE2,77,185,61,14,0,WS_EX_STATICEDGE
-    PUSHBUTTON      "All [80: Square Wave]",IDC_ALL_SQUAREWAVE3,143,185,61,14,0,WS_EX_STATICEDGE
-    PUSHBUTTON      "Random",IDC_ALL_SQUAREWAVE4,209,185,61,14,0,WS_EX_STATICEDGE
-    GROUPBOX        "&Program change specification:",IDC_STATIC,3,175,279,94
-    RTEXT           "1",IDC_STATIC,17,203,14,10
-    COMBOBOX        IDC_MIDIPC1,35,201,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    RTEXT           "2",IDC_STATIC,17,220,14,10
-    COMBOBOX        IDC_MIDIPC2,35,217,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    RTEXT           "3",IDC_STATIC,17,236,14,10
-    COMBOBOX        IDC_MIDIPC3,35,233,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    RTEXT           "4",IDC_STATIC,17,252,14,10
-    COMBOBOX        IDC_MIDIPC4,35,249,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    RTEXT           "5",IDC_STATIC,144,203,12,10
-    COMBOBOX        IDC_MIDIPC5,159,201,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    RTEXT           "6",IDC_STATIC,144,220,12,10
-    COMBOBOX        IDC_MIDIPC6,159,218,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    RTEXT           "7",IDC_STATIC,144,236,12,10
-    COMBOBOX        IDC_MIDIPC7,159,234,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    RTEXT           "8",IDC_STATIC,144,252,12,10
-    COMBOBOX        IDC_MIDIPC8,159,250,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Please write the letter (C), the year of publication, and the name of the copyright holder.",IDC_STATIC,66,164,205,19
+    PUSHBUTTON      "Set all to 1",IDC_ALL_SQUAREWAVE1,11,194,61,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "All [16:Organ]",IDC_ALL_SQUAREWAVE2,77,194,61,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "All [80: Square Wave]",IDC_ALL_SQUAREWAVE3,143,194,61,14,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Random",IDC_ALL_SQUAREWAVE4,209,194,61,14,0,WS_EX_STATICEDGE
+    GROUPBOX        "&Program change specification:",IDC_STATIC,3,184,279,94
+    RTEXT           "1",IDC_STATIC,17,212,14,10
+    COMBOBOX        IDC_MIDIPC1,35,210,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "2",IDC_STATIC,17,229,14,10
+    COMBOBOX        IDC_MIDIPC2,35,226,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "3",IDC_STATIC,17,245,14,10
+    COMBOBOX        IDC_MIDIPC3,35,242,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "4",IDC_STATIC,17,261,14,10
+    COMBOBOX        IDC_MIDIPC4,35,258,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "5",IDC_STATIC,144,212,12,10
+    COMBOBOX        IDC_MIDIPC5,159,210,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "6",IDC_STATIC,144,229,12,10
+    COMBOBOX        IDC_MIDIPC6,159,227,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "7",IDC_STATIC,144,245,12,10
+    COMBOBOX        IDC_MIDIPC7,159,243,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "8",IDC_STATIC,144,261,12,10
+    COMBOBOX        IDC_MIDIPC8,159,259,100,200,CBS_DROPDOWNLIST | CBS_HASSTRINGS | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "",1119,0,0,285,116
 END
 
@@ -1197,8 +1197,8 @@ METRO02                 WAVE                    "Wave\\Metro02.wav"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,3,0
- PRODUCTVERSION 3,0,3,0
+ FILEVERSION 3,0,4,0
+ PRODUCTVERSION 3,0,4,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1216,11 +1216,11 @@ BEGIN
             VALUE "Comments", "Please ignore the rough parts. "
             VALUE "CompanyName", "No extra taste."
             VALUE "FileDescription", "Organya 3"
-            VALUE "FileVersion", "3.0.3"
+            VALUE "FileVersion", "3.0.4"
             VALUE "LegalCopyright", "Copyright (C) 2005-2023 Pixel and Rxo Inverse"
             VALUE "OriginalFilename", "Organya.exe"
             VALUE "ProductName", "Organya 3"
-            VALUE "ProductVersion", "3.0.3"
+            VALUE "ProductVersion", "3.0.4"
         END
     END
     BLOCK "VarFileInfo"
@@ -1459,7 +1459,7 @@ BEGIN
     IDS_VALUESET1001900     "Recommended value is in range (100-1900)."
     IDS_VALUESET12000       "Value must be in range (1-2000)."
     IDS_WARNING_ACCESS_FILE "Couldn't access file."
-    IDS_WARNING_BUNKATSU    "The numbers for the division are wrong."
+    IDS_WARNING_BUNKATSU    "The numbers for the division are invalid."
 END
 
 STRINGTABLE
@@ -1536,10 +1536,10 @@ BEGIN
     IDS_STRING105           " selection"
     IDS_STRING106           "Selection of all tracks"
     IDS_GRID_STRING         "Custom Setting!4 Beat:4 Step!4 Beat:3 Step!3 Beat:4 Step!3 Beat:3 Step!4 Beat:6 Step!3 Beat:6 Step!4 Beat:2 Step!4 Beat:8 Step!4 Beat:12 Step!5 Beat:4 Step!!"
-    IDS_STRING108           "Default Pan/Volume Data [*.pvi]!*.pvi!All Formats [*.*]!*.*!!"
-    IDS_STRING109           "Organya Data [*.org]!*.org!All Formats [*.*]!*.*!!"
-    IDS_STRING110           "Standard MIDI File [*.mid]!*.mid!All Formats [*.*]!*.*!!"
-    IDS_STRING111           "Organya Data [*.org]!*.org!All Formats [*.*]!*.*!!"
+    IDS_STRING108           "Default Pan/Volume Data (*.pvi)!*.pvi!All Files (*.*)!*.*!!"
+    IDS_STRING109           "Organya Data (*.org)!*.org!All Files (*.*)!*.*!!"
+    IDS_STRING110           "Standard MIDI File (*.mid)!*.mid!All Files (*.*)!*.*!!"
+    IDS_STRING111           "Organya Data (*.org)!*.org!All Files (*.*)!*.*!!"
 END
 
 STRINGTABLE

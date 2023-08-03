@@ -58,7 +58,7 @@ extern void ChangeScrollMode(int iValue = -1);
 void PutRecentFile(char *FileName);
 void LoadRecentFromIniFile();
 void SaveRecentFilesToInifile();
-void SetLoadRecentFile(int iNum);
+bool SetLoadRecentFile(int iNum);
 void ClearRecentFile();
 
 int msgbox(HWND hWnd , int MessageID, int TitleID, UINT uType);		// 2014.10.18 
