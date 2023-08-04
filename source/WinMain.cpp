@@ -455,7 +455,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 		gfn[ggg]=0;
 		//MessageBox(hWnd,gfn,"Error(Load)",MB_OK);
 
-		if (org_data.FileCheckBeforeLoad(gfn)) { //A 2010.09.25 If the file is in Org format
+		if (!org_data.FileCheckBeforeLoad(gfn)) { //A 2010.09.25 If the file is in Org format
 			strcpy(music_file, gfn);
 			if (org_data.LoadMusicData() == TRUE) { //C 2010.09.25 Judgment added
 				SetModified(false);//title name set
