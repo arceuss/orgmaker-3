@@ -1032,6 +1032,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_HOMEBACK: //home
 				SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
 				break;
+			case ID_AC_TOEND: //home
+				SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
+				break;
 			case IDM_RECENT_CLEAR:
 				ClearRecentFile();
 				break;
