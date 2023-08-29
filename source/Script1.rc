@@ -990,7 +990,7 @@ BEGIN
         MENUITEM "  Always Select &Current Track\tCtrl+T", IDM_ALWAYS_CURRENT
         MENUITEM "  &Drag Note to Extend\tCtrl+Alt+F9", IDM_DRAGMODE
         MENUITEM "  &Click Note to Extend\tCtrl+Alt+F10", IDM_PRESSNOTE
-        MENUITEM "  Allow Keyboard During Playback(&P)", IDM_ENABLEPLAYING
+        MENUITEM "  Allow Keyboard During &Playback", IDM_ENABLEPLAYING
         MENUITEM SEPARATOR
         MENUITEM "Environment",                 IDM_DUMMY, INACTIVE
         POPUP "  &Memory"
