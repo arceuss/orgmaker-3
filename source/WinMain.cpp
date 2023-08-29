@@ -1322,16 +1322,20 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.VertScrollProc(SB_PAGEDOWN);
 			break;
 		case VK_UP:
-			scr_data.KeyScroll(DIRECTION_UP);
+			if (GetAsyncKeyState(VK_SHIFT)) scr_data.VertScrollProc(SB_PAGEUP);
+			else scr_data.KeyScroll(DIRECTION_UP);
 			break;
 		case VK_DOWN:
-			scr_data.KeyScroll(DIRECTION_DOWN);
+			if (GetAsyncKeyState(VK_SHIFT)) scr_data.VertScrollProc(SB_PAGEDOWN);
+			else scr_data.KeyScroll(DIRECTION_DOWN);
 			break;
 		case VK_LEFT:
-			scr_data.KeyScroll(DIRECTION_LEFT);
+			if (GetAsyncKeyState(VK_SHIFT)) scr_data.HorzScrollProc(SB_PAGELEFT);
+			else scr_data.KeyScroll(DIRECTION_LEFT);
 			break;
 		case VK_RIGHT:
-			scr_data.KeyScroll(DIRECTION_RIGHT);
+			if (GetAsyncKeyState(VK_SHIFT)) scr_data.HorzScrollProc(SB_PAGERIGHT);
+			else scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
 		case VK_F5:
 		case VK_NUMPAD0:
