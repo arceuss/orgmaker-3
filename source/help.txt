@@ -1,4 +1,4 @@
-Organya 3   Ver3.0.4   Simple Help
+Organya 3   Ver3.0.5   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   Basic usage is the same as "Organya 1" developed by Mr. Pixel.
@@ -257,6 +257,10 @@ Organya 3   Ver3.0.4   Simple Help
 
 
 # Revision History 
+
+  3.0.5  2023/08/29  Added Page Left/Right keybinds (shift+arrow key)
+                     Updated dialogs to allow 3-digit step input
+                     Fixed "Open with..."/dropped file not working
 
   3.0.4  2023/08/03  Removed "Precise" checkbox from repeat range and replaced it
                        with a separate step textbox
