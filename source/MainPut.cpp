@@ -210,10 +210,10 @@ void OrgData::PutNumber(void)
 	long scr_h,scr_v;
 	long scalepos;
 	int off, x;
-	char k1000,k100,k10,k1;
-	char i,j;
-	char k = info.dot*info.line;
-	char rr = 0;
+	short k1000,k100,k10,k1;
+	short i,j;
+	short k = info.dot*info.line;
+	short rr = 0;
 	GetMusicInfo(&mi);
 	scr_data.GetScrollPosition(&scr_h, &scr_v);
 	j = (WWidth/NoteWidth)/k + (scr_h % k != 0 ? 1 : 0);
