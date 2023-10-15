@@ -668,7 +668,7 @@ void OrgData::InitOrgData(void)
 	info.line = 4;
 	info.wait = 128;
 	info.repeat_x = info.dot * info.line * 0;
-	info.end_x = info.dot * info.line * MAXHORZMEAS; // updated
+	info.end_x = info.dot * info.line * 100; // updated
 	int i;
 	for(i = 0; i < MAXTRACK; i++){
 		info.tdata[i].freq = 1000;
