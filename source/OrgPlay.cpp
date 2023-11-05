@@ -68,8 +68,8 @@ void OrgData::PlayData(void)
 	if (sSmoothScroll || (play_p % (info.dot * info.line) == 0 && play_p + 1 != info.end_x)) {
 		DWORD dwNowTime;
 		dwNowTime = timeGetTime();
-		// Only draw if 8 ms have passed, to prevent lags
-		if (dwNowTime - lastDrawTime >= 16 + ((16 - NoteWidth) * 4)) { // 62.5 fps
+		// Only draw if ms have passed, to prevent lags
+		if (dwNowTime - lastDrawTime >= 20 + ((16 - NoteWidth) * 4)) { // 50 fps (cave story reference)
 			if (play_p != info.end_x) scr_data.SetHorzScroll(play_p);
 			else scr_data.SetHorzScroll(info.repeat_x);
 			lastDrawTime = dwNowTime;
