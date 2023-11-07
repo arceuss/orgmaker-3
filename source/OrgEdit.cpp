@@ -138,17 +138,18 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 	DelateNoteData(&pc);//消す
 
 	//ペーストリストの生成
-	np = p_list1 = p_list2= SearchNote(info.tdata[nc->track2].note_p);
-	np->length = 1;//仮生成
+	np = p_list1 = p_list2 = SearchNote(info.tdata[nc->track2].note_p);
 	if(np == NULL){//未使用音譜が不足
 		free( work );
 		return FALSE;
 	}
+	np->length = 1;//仮生成
 	for(i = 1; i < copy_num*nc->num; i++){
 		np = SearchNote(info.tdata[nc->track2].note_p);
 		if(np == NULL){//未使用音譜が不足
-			free( work );
-			return FALSE;
+			//free( work );
+			//return FALSE;
+			break;
 		}
 		np->length = 1;//仮生成
 		p_list2->to = np;
@@ -173,7 +174,9 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 			//次へ
 			np = np->to;
 			wp++;
+			if (np == NULL) break;
 		}
+		if (np == NULL) break;
 	}
 
 
