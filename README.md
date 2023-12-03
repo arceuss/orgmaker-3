@@ -1,4 +1,4 @@
-# &#x1F3BC; *Organya 3*
+# &#x1F3BC; *OrgMaker 3*
 
 **Fork of A music sequencer for retro video games**  
 
@@ -46,14 +46,14 @@ With the world knowing the development of "Cave Story", which increased the dema
 
 # &#x1F34E; Usage
 
-If you only use Organya, check out the [releases](https://github.com/Strultz/organya-3/releases).
+If you only use OrgMaker, check out the [releases](https://github.com/Strultz/organya-3/releases).
 
 # &#x1F34E; Contributing
 This project was developed in Japanese. The help file is also written in Japanese as well.
 I translated it to English anyway
 
 # &#x1F34E; Author
-## &#x1F352; Organya 3
+## &#x1F352; OrgMaker 3
 
 [Strultz](http://www.strultz.com/)
 ## &#x1F352; Twei
