@@ -46,7 +46,7 @@ With the world knowing the development of "Cave Story", which increased the dema
 
 # &#x1F34E; Usage
 
-If you only use OrgMaker, check out the [releases](https://github.com/Strultz/organya-3/releases).
+If you only use OrgMaker, check out the [releases](https://github.com/Strultz/orgmaker-3/releases).
 
 # &#x1F34E; Contributing
 This project was developed in Japanese. The help file is also written in Japanese as well.
