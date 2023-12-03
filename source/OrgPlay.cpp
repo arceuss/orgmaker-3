@@ -9,6 +9,7 @@ long play_p;//現在再生位置（キャンバス）
 NOTELIST *np[MAXTRACK];//現在再生準備の音符
 long now_leng[MAXMELODY] = {NULL};//再生中音符の長さ
 DWORD lastDrawTime = -1;
+DWORD drawCatch = 0;
 extern HWND hDlgPlayer;
 extern int sMetronome;
 extern int sSmoothScroll;
@@ -69,10 +70,12 @@ void OrgData::PlayData(void)
 		DWORD dwNowTime;
 		dwNowTime = timeGetTime();
 		// Only draw if ms have passed, to prevent lags
-		if (dwNowTime - lastDrawTime >= 20 + ((16 - NoteWidth) * 4)) { // 50 fps (cave story reference)
+		if (dwNowTime - lastDrawTime >= drawCatch) { // 50 fps (cave story reference)
 			if (play_p != info.end_x) scr_data.SetHorzScroll(play_p);
 			else scr_data.SetHorzScroll(info.repeat_x);
-			lastDrawTime = dwNowTime;
+			lastDrawTime = timeGetTime();
+			drawCatch = lastDrawTime - dwNowTime;
+			if (drawCatch > 500) drawCatch = 500;
 		}
 	}
 	if (sMetronome && info.wait >= 8) { // So it wont play sound too fast
