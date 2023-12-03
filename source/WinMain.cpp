@@ -1035,6 +1035,18 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			case ID_AC_TOEND: //home
 				SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
 				break;
+			case ID_AC_MEASBACK:
+				SendMessage(hDlgPlayer, WM_COMMAND, IDC_LEFT, NULL);
+				break;
+			case ID_AC_MEASNEXT:
+				SendMessage(hDlgPlayer, WM_COMMAND, IDC_RIGHT, NULL);
+				break;
+			case ID_AC_SOCTUP:
+				scr_data.VertScrollProc(SB_PAGEDOWN);
+				break;
+			case ID_AC_SOCTDOWN:
+				scr_data.VertScrollProc(SB_PAGEUP);
+				break;
 			case IDM_RECENT_CLEAR:
 				ClearRecentFile();
 				break;
@@ -1322,20 +1334,16 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			scr_data.VertScrollProc(SB_PAGEDOWN);
 			break;
 		case VK_UP:
-			if (GetAsyncKeyState(VK_SHIFT)) scr_data.VertScrollProc(SB_PAGEUP);
-			else scr_data.KeyScroll(DIRECTION_UP);
+			scr_data.KeyScroll(DIRECTION_UP);
 			break;
 		case VK_DOWN:
-			if (GetAsyncKeyState(VK_SHIFT)) scr_data.VertScrollProc(SB_PAGEDOWN);
-			else scr_data.KeyScroll(DIRECTION_DOWN);
+			scr_data.KeyScroll(DIRECTION_DOWN);
 			break;
 		case VK_LEFT:
-			if (GetAsyncKeyState(VK_SHIFT)) scr_data.HorzScrollProc(SB_PAGELEFT);
-			else scr_data.KeyScroll(DIRECTION_LEFT);
+			scr_data.KeyScroll(DIRECTION_LEFT);
 			break;
 		case VK_RIGHT:
-			if (GetAsyncKeyState(VK_SHIFT)) scr_data.HorzScrollProc(SB_PAGERIGHT);
-			else scr_data.KeyScroll(DIRECTION_RIGHT);
+			scr_data.KeyScroll(DIRECTION_RIGHT);
 			break;
 		case VK_F5:
 		case VK_NUMPAD0:

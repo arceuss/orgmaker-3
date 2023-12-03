@@ -1,7 +1,7 @@
-Organya 3   Ver3.0.5   Simple Help
+OrgMaker 3   Ver3.0.6   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-  Basic usage is the same as "Organya 1" developed by Mr. Pixel.
+  Basic usage is the same as "OrgMaker 1" developed by Mr. Pixel.
   I have added variable window size, colored notes,
   changed "Dram" wording to "Drum" wording (laugh),
   released drum objects that weren't released (smile),
@@ -258,6 +258,12 @@ Organya 3   Ver3.0.5   Simple Help
 
 # Revision History 
 
+  3.0.6  2023/12/02  Default repeat end changed to 100 measures
+                     Smooth scrolling no longer slows down song playback in
+                       certain cases
+                     Fixed a quick copy crash
+                     Fixed a crash with 16/16 time
+
   3.0.5  2023/08/29  Added Page Left/Right keybinds (shift+arrow key)
                      Updated dialogs to allow 3-digit step input
                      Fixed "Open with..."/dropped file not working
@@ -369,7 +375,7 @@ Organya 3   Ver3.0.5   Simple Help
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  The following is the help file that came with Organya 1.3.4.
+  The following is the help file that came with OrgMaker 1.3.4.
   There are points where the specifications are slightly
   different, for your information.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
