@@ -660,6 +660,7 @@ BOOL CALLBACK DialogWave(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					GetDlgItemText(hdwnd,IDD_SETFREQx0+j,str,7); i = atol(str); mi.tdata[j].freq = (i>0xFFFF) ? 0xFFFF : i;
 					n |= (i < 100 || i >1999) ? 1 : 0;
 					mi.tdata[j].pipi = (IsDlgButtonChecked( hdwnd, IDC_CHECK_PIPIx0+j )) ? 1 : 0;
+					MakeOrganyaWave(j, mi.tdata[j].wave_no, mi.tdata[j].pipi); // add this so it updates if pipi changes
 				}
 				//if (n) MessageBox(hdwnd,"100Å`1900Ç…ê›íËÇµÇΩÇŸÇ§Ç™Ç¢Ç¢Ç≈Ç∑ÇÊÅB","Ç®ímÇÁÇπ(é¸îgêî)",MB_OK);	// 2014.10.19 D
 				if (n) msgbox(hdwnd,IDS_VALUESET1001900,IDS_INFO_TITLE_FREQ,MB_OK);	// 2014.10.19 A
