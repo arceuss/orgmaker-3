@@ -856,7 +856,7 @@ BOOL OrgData::SetNote_onlyLength(long x, long Length)
 		p = p->to;
 	}
 	if(p->x == x){
-		if(Length<MAXNOTELENGTH){
+		if(Length < MAXNOTELENGTH && Length != 0){
 			if(p->length != (char)Length){ //A 2010.08.14 
 				p->length = (char)Length;
 			}else{
