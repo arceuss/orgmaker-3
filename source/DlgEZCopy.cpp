@@ -353,7 +353,7 @@ void EZ_Paste(int iNum)
 		nc_Select.track1 = tra;
 		nc_Select.track2 = org_data.track;
 		org_data.CopyNoteData(&nc_Select);
-		org_data.CheckNoteTail(tra);
+		org_data.CheckNoteTail(org_data.track);
 		
 	}
 	//MessageBox(NULL,"コピーしました","通知",MB_OK);

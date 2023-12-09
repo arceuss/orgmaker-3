@@ -209,7 +209,7 @@ BOOL OrgData::CopyNoteData(NOTECOPY *nc)
 			p_list2->to = np->to;
 			np->to = p_list1;
 			p_list1->from = np;
-			delete work;
+			free( work );
 			return TRUE;
 		}
 
