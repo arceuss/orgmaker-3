@@ -191,13 +191,13 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 				//		if(mouse_x >= 0 && mouse_y >= 0 && mouse_y < 288+WDWHEIGHTPLUS){//鍵盤
 				if (mouse_x >= 0 && mouse_y >= 0 && mouse_y < WHeight + 288 - WHNM) {//鍵盤
 					newn = unsigned char(95 - (mouse_y / 12 + scr_v));
-					if (keyDrag != newn) {
+					if (keyDrag != newn && newn < 96) {
 						org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
 						org_data.TouchKeyboard(newn);//96*12は楽譜の縦サイズ
 						org_data.PutMusic();//Redrawing sheet music
 						RedrawWindow(hWnd, &rectALL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
+						keyDrag = newn;
 					}
-					keyDrag = newn;
 				}
 			}
 			//if(PutStartX>-99999+1){ //音符ドラッグ 2010.09.23 D
