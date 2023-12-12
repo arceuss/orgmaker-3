@@ -125,9 +125,9 @@ void LButtonUP(WPARAM wParam, LPARAM lParam)
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 	}
-	if (keyDrag != -99999 && keyDrag < 96) {
+	if (keyDrag != -99999) {
 		scr_data.GetScrollPosition(&scr_h, &scr_v);
-		org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
+		if (keyDrag < 96) org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
 		org_data.PutMusic();//Redrawing sheet music
 		RedrawWindow(hWnd, &rectALL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
 		keyDrag = -99999;
@@ -191,9 +191,9 @@ void MouseDrag(WPARAM wParam, LPARAM lParam)
 				//		if(mouse_x >= 0 && mouse_y >= 0 && mouse_y < 288+WDWHEIGHTPLUS){//鍵盤
 				if (mouse_x >= 0 && mouse_y >= 0 && mouse_y < WHeight + 288 - WHNM) {//鍵盤
 					newn = unsigned char(95 - (mouse_y / 12 + scr_v));
-					if (keyDrag != newn && newn < 96) {
-						org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
-						org_data.TouchKeyboard(newn);//96*12は楽譜の縦サイズ
+					if (keyDrag != newn) {
+						if (keyDrag < 96) org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
+						if (newn < 96) org_data.TouchKeyboard(newn);//96*12は楽譜の縦サイズ
 						org_data.PutMusic();//Redrawing sheet music
 						RedrawWindow(hWnd, &rectALL, NULL, RDW_INVALIDATE | RDW_ERASENOW);
 						keyDrag = newn;
