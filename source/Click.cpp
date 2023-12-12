@@ -125,7 +125,7 @@ void LButtonUP(WPARAM wParam, LPARAM lParam)
 		RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
 
 	}
-	if (keyDrag != -99999) {
+	if (keyDrag != -99999 && keyDrag < 96) {
 		scr_data.GetScrollPosition(&scr_h, &scr_v);
 		org_data.StopKeyboard(keyDrag);//96*12は楽譜の縦サイズ
 		org_data.PutMusic();//Redrawing sheet music
