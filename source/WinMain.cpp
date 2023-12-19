@@ -228,11 +228,20 @@ void GetApplicationPath(char* path) {
 	strcpy(path, drv);
 }
 
+LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
+	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "OrgMaker Crash", MB_OK | MB_ICONERROR);
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile,int nCmdShow)
 {//main function
 	MSG msg;//Parameters used by this app	
 	WNDCLASSEX wc;
 //	MessageBox(hWnd,dropfile,"Drap",MB_OK);
+#ifndef _DEBUG
+	SetUnhandledExceptionFilter(OrgCrashHandler);
+#endif
 	InitMMTimer();  // 2010.09.21
 	strSize[0]=0;	// 2010.08.14 A
 	for(int jjj=0;jjj<128;jjj++)iKeyPhase[jjj]=-1;
@@ -341,7 +350,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 
 	//Generate main window
 	hWnd = CreateWindow(lpszName,
-			"Organya 3",//Displayed "Name"
+			"OrgMaker 3",//Displayed "Name"
 			ul,
 			//WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_THICKFRAME|WS_MAXIMIZEBOX,
 //            WS_CAPTION|WS_VISIBLE|WS_SYSMENU,//window style
@@ -532,18 +541,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	return msg.wParam;//application ends here
 }
 
-LONG WINAPI OrgCrashHandler(EXCEPTION_POINTERS* ep) {
-	MessageBox(NULL, "A fatal error has occurred. The program will now exit.", "Organya Crash", MB_OK | MB_ICONERROR);
-
-	return EXCEPTION_EXECUTE_HANDLER;
-}
-
 //main procedure
 LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-#ifndef _DEBUG
-	SetUnhandledExceptionFilter(OrgCrashHandler);
-#endif
 //	char str[64];
 	int i, j;	// 2014.10.18 Added j
 	char res;

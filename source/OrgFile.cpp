@@ -174,6 +174,7 @@ BOOL OrgData::LoadMusicData(void)
 	int i,j;
 	char pass_check[6];
 	char ver = 0;
+	bool cflag = false;
 
 	//｣｣｣｣｣｣｣｣｣｣｣｣｣｣｣ロード
 	FILE *fp;
@@ -223,13 +224,19 @@ BOOL OrgData::LoadMusicData(void)
 			info.tdata[j].note_list = NULL;
 			continue;
 		}
+		if (org_data.tdata[j].note_num > info.alloc_note) {
+			if (!cflag) {
+				MessageBox(NULL, "Some tracks were truncated due to having too many events.", "Notice", MB_OK | MB_ICONASTERISK);
+				cflag = true;
+			}
+		}
 		//リストを作る
 		np = info.tdata[j].note_p;
 		info.tdata[j].note_list = info.tdata[j].note_p;
 		np->from = NULL;
 		np->to = (np + 1);
 		np++;
-		for(i = 1; i < org_data.tdata[j].note_num; i++){
+		for(i = 1; i < org_data.tdata[j].note_num && i < info.alloc_note; i++){
 			np->from = (np - 1);
 			np->to = (np + 1);
 			np++;
@@ -241,26 +248,32 @@ BOOL OrgData::LoadMusicData(void)
 		//内容を代入
 		np = info.tdata[j].note_p;//Ｘ座標
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
+			if (i >= info.alloc_note) { fseek(fp, sizeof(long), SEEK_CUR); continue; }
 			fread(&np->x,      sizeof(long), 1, fp);
 			np++;
 		}
 		np = info.tdata[j].note_p;//Ｙ座標
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
+			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->y,      sizeof(unsigned char), 1, fp);
 			np++;
 		}
 		np = info.tdata[j].note_p;//長さ
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
+			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->length, sizeof(unsigned char), 1, fp);
+			if (np->length == 0) np->length = 1; // org corruption fix
 			np++;
 		}
 		np = info.tdata[j].note_p;//ボリューム
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
+			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->volume, sizeof(unsigned char), 1, fp);
 			np++;
 		}
 		np = info.tdata[j].note_p;//パン
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
+			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->pan,    sizeof(unsigned char), 1, fp);
 			np++;
 		}
