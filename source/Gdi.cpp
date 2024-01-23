@@ -482,7 +482,7 @@ void LoadSingleBitmap(HWND hdwnd, int item, int wdth, int hght, const char* name
 	char str[MAX_PATH + 20];
 	memset(str, '\0', sizeof(str));
 	// File name for theme
-	if (useTheme) sprintf(str, "%s\\%s%s", gSelectedTheme, name, ".pbm");
+	if (useTheme) sprintf(str, "%s\\%s%s", gSelectedTheme, name, ".bmp");
 	else strcpy(str, name);
 	// Load it
 	hBmp = (HBITMAP)LoadImage(useTheme ? NULL : hInst, str, IMAGE_BITMAP, wdth, hght, useTheme ? (LR_LOADFROMFILE | LR_DEFAULTCOLOR) : LR_DEFAULTCOLOR);
