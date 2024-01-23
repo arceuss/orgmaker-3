@@ -434,8 +434,8 @@ CAPTION "About OrgMaker"
 FONT 9, "MS PGothic", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,113,40,18
-    CTEXT           "OrgMaker ver.3.0.6",IDC_STATIC,20,32,80,8
-    LTEXT           "2023 / 12 / 02",IDC_STATIC,37,43,44,8
+    CTEXT           "OrgMaker ver.3.0.7",IDC_STATIC,20,32,80,8
+    LTEXT           "2024 / 01 / 22",IDC_STATIC,37,43,44,8
     CTEXT           "OrgMaker 1 by Studio Pixel",IDC_STATIC,2,57,114,16,SS_CENTERIMAGE | SS_SUNKEN
     ICON            "ICON",ID_ICON_ORG,49,3,20,20,SS_NOTIFY,WS_EX_DLGMODALFRAME
     CTEXT           "OrgMaker 2 by Rxo Inverse",IDC_STATIC,2,75,114,16,SS_CENTERIMAGE | SS_SUNKEN
@@ -1197,8 +1197,8 @@ METRO02                 WAVE                    "Wave\\Metro02.wav"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,6,0
- PRODUCTVERSION 3,0,6,0
+ FILEVERSION 3,0,7,0
+ PRODUCTVERSION 3,0,7,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1216,11 +1216,11 @@ BEGIN
             VALUE "Comments", "Please ignore the rough parts. "
             VALUE "CompanyName", "No extra taste."
             VALUE "FileDescription", "OrgMaker 3"
-            VALUE "FileVersion", "3.0.6"
-            VALUE "LegalCopyright", "Copyright (C) 2005-2023 Pixel and Rxo Inverse"
+            VALUE "FileVersion", "3.0.7"
+            VALUE "LegalCopyright", "Copyright (C) 2005-2024 Pixel and Rxo Inverse"
             VALUE "OriginalFilename", "OrgMaker.exe"
             VALUE "ProductName", "OrgMaker 3"
-            VALUE "ProductVersion", "3.0.6"
+            VALUE "ProductVersion", "3.0.7"
         END
     END
     BLOCK "VarFileInfo"

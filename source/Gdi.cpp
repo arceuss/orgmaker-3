@@ -237,14 +237,14 @@ bool MakeMusicParts(unsigned char line,unsigned char dot)
 	for(int i = 0; i < (WWidth/NoteWidth)+(line * dot) + 1; i++){ // 15
 		if(i%(line*dot) == 0)//線
 //			BitBlt(toDC,i*16,0,16,192+WDWHEIGHTPLUS,fromDC,x+64,0,SRCCOPY);//表示
-			BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM,fromDC,x+64,0,SRCCOPY);//表示
+			BitBlt(toDC,i*NoteWidth,0,NoteWidth,144,fromDC,x+64,0,SRCCOPY);//表示
 		else if(i%dot == 0)//破線
-			BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM,fromDC,x+64+16,0,SRCCOPY);//表示
+			BitBlt(toDC,i*NoteWidth,0,NoteWidth,144,fromDC,x+64+16,0,SRCCOPY);//表示
 		else{
 			if(NoteWidth>=8){
-				BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM,fromDC,x+64+32,0,SRCCOPY);//表示
+				BitBlt(toDC,i*NoteWidth,0,NoteWidth,144,fromDC,x+64+32,0,SRCCOPY);//表示
 			}else{
-				BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM,fromDC,x+64+32+1,0,SRCCOPY);//表示
+				BitBlt(toDC,i*NoteWidth,0,NoteWidth,144,fromDC,x+64+32+1,0,SRCCOPY);//表示
 			}
 		}
 	}
@@ -270,7 +270,7 @@ void PutMusicParts(long x,long y)
 	toold   = (HBITMAP)SelectObject(toDC,hbWork);
 	fromold = (HBITMAP)SelectObject(fromDC,hbMparts);
 
-	BitBlt(toDC,x,y,WWidth - x,WHeight+192-WHNM,fromDC,0,0,SRCCOPY);//表示
+	BitBlt(toDC,x,y,WWidth - x,144,fromDC,0,0,SRCCOPY);//表示
 
 	SelectObject(toDC,toold);
 	SelectObject(fromDC,fromold);
@@ -285,6 +285,7 @@ void PutPanParts(long x)
 
 	HDC hdc,toDC,fromDC;
 	HBITMAP toold,fromold;
+	int y = WHeight + 288 - WHNM;
 
 	hdc = GetDC(hWnd);
 	toDC   = CreateCompatibleDC(hdc);
@@ -292,7 +293,7 @@ void PutPanParts(long x)
 	toold   = (HBITMAP)SelectObject(toDC,hbWork);
 	fromold = (HBITMAP)SelectObject(fromDC,hbPan);
 
-	BitBlt(toDC,x,WHeight+288-WHNM,WWidth - x,WHeight+192-WHNM,fromDC,0,0,SRCCOPY);//表示
+	BitBlt(toDC,x,y,WWidth - x,144 + 16,fromDC,0,0,SRCCOPY);//表示
 
 	SelectObject(toDC,toold);
 	SelectObject(fromDC,fromold);
@@ -329,14 +330,14 @@ void MakePanParts(unsigned char line,unsigned char dot)
 //	for(int i = 0; i < 40; i++){
 	for(int i = 0; i < (WWidth/NoteWidth)+ (line * dot) + 1; i++){ // 15
 		if(i%(line*dot) == 0)//線
-			BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM+16,fromDC,64,0,SRCCOPY);//表示
+			BitBlt(toDC,i*NoteWidth,0,NoteWidth,160,fromDC,64,0,SRCCOPY);//表示
 		else if(i%dot == 0)//破線
-			BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM+16,fromDC,64+16,0,SRCCOPY);//表示
+			BitBlt(toDC,i*NoteWidth,0,NoteWidth,160,fromDC,64+16,0,SRCCOPY);//表示
 		else {
 			if(NoteWidth>=8){
-				BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM+16,fromDC,64+32,0,SRCCOPY);//表示
+				BitBlt(toDC,i*NoteWidth,0,NoteWidth,160,fromDC,64+32,0,SRCCOPY);//表示
 			}else{
-				BitBlt(toDC,i*NoteWidth,0,NoteWidth,WHeight+192-WHNM+16,fromDC,64+32+1,0,SRCCOPY);//表示
+				BitBlt(toDC,i*NoteWidth,0,NoteWidth,160,fromDC,64+32+1,0,SRCCOPY);//表示
 			}
 		}
 	}
@@ -359,7 +360,7 @@ void PutSelectParts(long x)
 	toold   = (HBITMAP)SelectObject(toDC,hbWork);
 	fromold = (HBITMAP)SelectObject(fromDC,hbPan);
 
-	BitBlt(toDC,x,WHeight-16,WWidth - x,WHeight,fromDC,0,144,SRCCOPY);//表示
+	BitBlt(toDC,x,WHeight-16,WWidth - x,16,fromDC,0,144,SRCCOPY);//表示
 
 	SelectObject(toDC,toold);
 	SelectObject(fromDC,fromold);

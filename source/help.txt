@@ -1,4 +1,4 @@
-OrgMaker 3   Ver3.0.6   Simple Help
+OrgMaker 3   Ver3.0.7   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   Basic usage is the same as "OrgMaker 1" developed by Mr. Pixel.
@@ -257,6 +257,15 @@ OrgMaker 3   Ver3.0.6   Simple Help
 
 
 # Revision History 
+
+  3.0.7  2024/01/22  Themes now support editing the main cursor
+                     Fixed a crash with keyboard preview
+                     Fixed small issues with loading/saving .org files
+                     Theme image files now use .bmp extension
+                     Fixed pipi setting not updating properly
+                     Fixed bug with note length while copying
+                     Fixed broken visuals on very small window sizes
+                     Fixed visual layers being incorrect
 
   3.0.6  2023/12/02  Default repeat end changed to 100 measures
                      Smooth scrolling no longer slows down song playback in

@@ -103,8 +103,8 @@ typedef struct OrgData{
 
 		void GetNoteUsed(long *use,long *left,char track);//‰¹•ˆŽc—Ê“™
 		//ˆÈ‰º‚Í•\Ž¦
-		void PutNotes(int TPCY=0);
-		void PutNotes2(int TPCY=0);
+		void PutNotes(int TPCY, bool vol);
+		void PutNotes2(int TPCY, bool vol);
 		void PutMusic(void);
 		void PutNumber(void);
 		void PutRepeat(void);
