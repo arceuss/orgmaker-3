@@ -208,6 +208,7 @@ void ReloadBitmaps() {
 	org_data.GetMusicInfo(&mi);
 	
 	InitBitmaps();
+	InitCursor();
 	LoadPlayerBitmaps(hDlgPlayer);
 	LoadTrackBitmaps(hDlgTrack);
 
@@ -294,7 +295,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 	wc.hInstance     = hInst = hInstance;
 	wc.hIcon         = LoadIcon(hInst,"ICON");//big icon
 	wc.hIconSm       = LoadIcon(hInst,"ICON");//small icon
-	wc.hCursor       = LoadCursor(hInst,"CURSOR");//cursor
+	wc.hCursor       = LoadCursor(hInst,"CURSOR");//default cursor
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);//window color
 	wc.lpszMenuName  = "ORGANYAMENU";//menu
 	wc.lpszClassName = lpszName;
@@ -383,6 +384,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR dropfile
 //Image initialization //////////
 	StartGDI(hWnd);//GDI ready
 	InitBitmaps();
+	InitCursor();
 //Sound initialization ///////
 	InitDirectSound(hWnd);
 //	LoadWaveData100(); //Load from file "Wave.dat"

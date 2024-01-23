@@ -83,7 +83,7 @@ HBITMAP InitBitmap(char *name,int no)
 	}
 	memset(str, '\0', sizeof(str));
 
-	if (useTheme) sprintf(str, "%s\\%s%s", gSelectedTheme, name, ".pbm");
+	if (useTheme) sprintf(str, "%s\\%s%s", gSelectedTheme, name, ".bmp");
 	else strcpy(str, name);
 	hBmp[no] = (HBITMAP)LoadImage(useTheme ? NULL : GetModuleHandle(NULL),
 		str,IMAGE_BITMAP,0,0,cap);
@@ -92,6 +92,28 @@ HBITMAP InitBitmap(char *name,int no)
 			name, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 	return hBmp[no];
+}
+void InitCursor(void)
+{
+	UINT cap = 0;
+	bool useTheme = false;
+	char str[MAX_PATH + 20];
+	if (strlen(gSelectedTheme) > 0) {
+		cap = LR_LOADFROMFILE;
+		useTheme = true;
+	}
+	memset(str, '\0', sizeof(str));
+
+	if (useTheme) sprintf(str, "%s\\CURSOR%s", gSelectedTheme, ".cur");
+	else strcpy(str, "CURSOR");
+	HCURSOR ccur = (HCURSOR)LoadImage(useTheme ? NULL : GetModuleHandle(NULL),
+		str, IMAGE_CURSOR, 0, 0, cap);
+	if (ccur == NULL && useTheme) { // fallback
+		ccur = (HCURSOR)LoadImage(GetModuleHandle(NULL),
+			"CURSOR", IMAGE_CURSOR, 0, 0, 0);
+	}
+	ccur = (HCURSOR)SetClassLongPtr(hWnd, GCLP_HCURSOR, (LONG)ccur);
+	if (ccur != NULL) DestroyCursor(ccur);
 }
 
 //‚¢‚í‚ä‚éƒtƒŠƒbƒv

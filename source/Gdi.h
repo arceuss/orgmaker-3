@@ -11,6 +11,7 @@ BOOL ResizeGDI(HWND hwnd);
 void EndGDI(void);
 //画像のロード(リソースから)
 HBITMAP InitBitmap(char *name,int bmp_no);
+void InitCursor();
 //いわゆるフリップ
 void RefleshScreen(HDC hdc);
 void PutRect(RECT* rect, int color);
