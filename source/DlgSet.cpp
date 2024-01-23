@@ -866,7 +866,7 @@ BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam
 	switch (message) {
 	case WM_INITDIALOG://ダイアログが呼ばれた
 	{
-		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"Organya 3 (default)");
+		SendDlgItemMessage(hdwnd, IDD_THEMES, LB_ADDSTRING, 0, (LPARAM)"OrgMaker 3 (default)");
 
 		WIN32_FIND_DATA fdFile;
 		HANDLE hFind = NULL;
