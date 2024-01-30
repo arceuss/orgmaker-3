@@ -322,10 +322,11 @@ void ChangeOrganFrequency(unsigned char key,char track, DWORD a)
 			//dmmult = (0.98f + ((double)a / 50000.0f));
 			//tmpDouble = (((double)oct_wave[j].wave_size * freq_tbl[key]) * (double)oct_wave[j].oct_par) / (8.00f * (2.0f - dmmult));
 			
-			lpORGANBUFFER[track][j][i]->SetFrequency(//1000を+αのデフォルト値とする
-				(DWORD)tmpDouble
-//				((oct_wave[j].wave_size*freq_tbl[key])*oct_wave[j].oct_par)/8 + (a-1000)
-			);
+			if (lpORGANBUFFER[track][j][i] != NULL)
+				lpORGANBUFFER[track][j][i]->SetFrequency(//1000を+αのデフォルト値とする
+					(DWORD)tmpDouble
+//					((oct_wave[j].wave_size*freq_tbl[key])*oct_wave[j].oct_par)/8 + (a-1000)
+				);
 		}
 }
 short pan_tbl[13] = {0,43,86,129,172,215,256,297,340,383,426,469,512}; 
@@ -334,12 +335,12 @@ unsigned char key_on[MAXTRACK] = {0};//キースイッチ
 unsigned char key_twin[MAXTRACK] = {0};//今使っているキー(連続時のノイズ防止の為に二つ用意)
 void ChangeOrganPan(unsigned char key, unsigned char pan,char track)//512がMAXで256がﾉｰﾏﾙ
 {
-	if(old_key[track] != 255)
+	if(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]] != NULL && old_key[track] != 255)
 		lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->SetPan((pan_tbl[pan]-256)*10);
 }
 void ChangeOrganVolume(int no, long volume,char track)//300がMAXで300がﾉｰﾏﾙ
 {
-	if(old_key[track] != 255)
+	if(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]] != NULL && old_key[track] != 255)
 		lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->SetVolume((volume-255)*8);
 }
 // サウンドの再生 
@@ -610,15 +611,18 @@ BOOL LoadDramObject(char *file_name, int no)
 }*/
 void ChangeDramFrequency(unsigned char key,char track)
 {
-	lpDRAMBUFFER[track]->SetFrequency(key*800+100);
+	if (lpDRAMBUFFER[track] != NULL)
+		lpDRAMBUFFER[track]->SetFrequency(key*800+100);
 }
 void ChangeDramPan(unsigned char pan,char track)//512がMAXで256がﾉｰﾏﾙ
 {
-	lpDRAMBUFFER[track]->SetPan((pan_tbl[pan]-256)*10);
+	if (lpDRAMBUFFER[track] != NULL)
+		lpDRAMBUFFER[track]->SetPan((pan_tbl[pan]-256)*10);
 }
 void ChangeDramVolume(long volume,char track)//
 {
-	lpDRAMBUFFER[track]->SetVolume((volume-255)*8);
+	if (lpDRAMBUFFER[track] != NULL)
+		lpDRAMBUFFER[track]->SetVolume((volume-255)*8);
 }
 // サウンドの再生 
 void PlayDramObject(unsigned char key, int mode,char track)
@@ -646,8 +650,8 @@ void PlayDramObject(unsigned char key, int mode,char track)
 
 void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 {
-	if(key>96)return;
-	if(track < MAXMELODY){
+	if (key > 96) return;
+	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][0] != NULL){
 		DWORD wait = timeGetTime();
 		ChangeOrganFrequency(key%12,track,freq);//周波数を設定して
 		lpORGANBUFFER[track][key/12][0]->SetVolume((160-255)*8);
@@ -657,7 +661,7 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 		}while(timeGetTime() < wait + (DWORD)Nagasa);
 //		lpORGANBUFFER[track][key/12][0]->Play(0, 0, 0); //C 2010.09.23 即時停止する。
 		lpORGANBUFFER[track][key/12][0]->Stop();
-	}else{
+	} else if (lpDRAMBUFFER[track - MAXMELODY] != NULL) {
 		lpDRAMBUFFER[track - MAXMELODY]->Stop();
 		lpDRAMBUFFER[track - MAXMELODY]->SetCurrentPosition(0);
 		ChangeDramFrequency(key,track - MAXMELODY);//周波数を設定して
@@ -671,13 +675,13 @@ void PlayOrganKey(unsigned char key,char track,DWORD freq,int Nagasa)
 //2010.08.14 A
 void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 {
-	if(key>96)return;
-	if(track < MAXMELODY){
+	if (key > 96) return;
+	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		ChangeOrganFrequency(key%12,track,freq);
 		lpORGANBUFFER[track][key/12][Phase]->SetVolume((160-255)*8);
 		lpORGANBUFFER[track][key/12][Phase]->SetPan(0);
 		lpORGANBUFFER[track][key/12][Phase]->Play(0, 0, DSBPLAY_LOOPING);
-	}else{
+	} else if (lpDRAMBUFFER[track - MAXMELODY] != NULL) {
 		lpDRAMBUFFER[track - MAXMELODY]->Stop();
 		lpDRAMBUFFER[track - MAXMELODY]->SetCurrentPosition(0);
 		ChangeDramFrequency(key,track - MAXMELODY);//周波数を設定して
@@ -689,10 +693,11 @@ void Rxo_PlayKey(unsigned char key,char track,DWORD freq, int Phase)
 //2010.08.14 A
 void Rxo_StopKey(unsigned char key,char track, int Phase)
 {
-	if(track < MAXMELODY){
+	if (key > 96) return;
+	if (track < MAXMELODY && lpORGANBUFFER[track][key/12][Phase] != NULL) {
 		//lpORGANBUFFER[track][key/12][Phase]->Play(0, 0, 0);	// 2010.08.14 D
 		lpORGANBUFFER[track][key/12][Phase]->Stop();	// 2010.08.14 A
-	}else{
+	} else if (lpDRAMBUFFER[track - MAXMELODY] != NULL) {
 		lpDRAMBUFFER[track - MAXMELODY]->Stop();
 		lpDRAMBUFFER[track - MAXMELODY]->SetCurrentPosition(0);
 	}	
@@ -708,11 +713,17 @@ void Rxo_ShowDirectSoundObject(HWND hwnd)
 void Rxo_StopAllSoundNow(void)
 {
 	int i,j,k;
-	for(i=0;i<SE_MAX;i++) if(lpSECONDARYBUFFER[i]!=NULL)lpSECONDARYBUFFER[i]->Stop();
+	for (i = 0; i < SE_MAX; i++)
+		if(lpSECONDARYBUFFER[i] != NULL) lpSECONDARYBUFFER[i]->Stop();
 	
-	for(i=0;i<8;i++){
-		for(j=0;j<8;j++)for(k=0;k<2;k++)lpORGANBUFFER[i][j][k]->Stop();
-		lpDRAMBUFFER[i]->Stop();
+	for (i = 0; i < 8; i++){
+		for (j = 0; j < 8; j++) {
+			for (k = 0; k < 2; k++) {
+				if (lpORGANBUFFER[i][j][k] != NULL) lpORGANBUFFER[i][j][k]->Stop();
+			}
+		}
+		if (lpDRAMBUFFER[i] != NULL) lpDRAMBUFFER[i]->Stop();
 	}
-	for(i=0;i<MAXTRACK;i++)old_key[i]=255; //2014.05.02 A これで頭が変な音にならなくする。
+	for (i = 0; i < MAXTRACK; i++)
+		old_key[i]=255; //2014.05.02 A これで頭が変な音にならなくする。
 }
