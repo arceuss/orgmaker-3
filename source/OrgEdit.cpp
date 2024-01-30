@@ -842,10 +842,17 @@ bool OrgData::CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack )
 BOOL OrgData::SwapTrack(NOTECOPY *pc)
 {
 	TRACKDATA tmp;
+	char w1 = info.tdata[pc->track1].wave_no; // crash fix
+	char w2 = info.tdata[pc->track2].wave_no;
 	
 	memcpy(&tmp, &info.tdata[ pc->track1 ], sizeof(TRACKDATA));
 	memcpy(&info.tdata[ pc->track1 ], &info.tdata[ pc->track2 ], sizeof(TRACKDATA));
 	memcpy(&info.tdata[ pc->track2 ], &tmp, sizeof(TRACKDATA));
+
+	if (pc->track1 / 8 != pc->track2 / 8) { // crash fix
+		info.tdata[pc->track1].wave_no = w1;
+		info.tdata[pc->track2].wave_no = w2;
+	}
 
 	unsigned char uctmp;
 	uctmp = def_pan[pc->track1];
