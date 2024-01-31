@@ -1376,9 +1376,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case 0xDD:
 
 			if((lParam & 0x40000000) ==0 && (timer_sw==0 || iChangeEnablePlaying!=0)){
+				org_data.GetMusicInfo(&mi);
 				iKeyPhase[iCast[wParam]]=iCurrentPhase;
 				iCurrentPhase=-iCurrentPhase + 1;
-				Rxo_PlayKey(iCast[wParam] + iPushShift[0]*12 -iPushShift[1]*12 , org_data.track, 1000, iKeyPhase[iCast[wParam]]);
+				Rxo_PlayKey(iCast[wParam] + iPushShift[0]*12 -iPushShift[1]*12 , org_data.track, mi.tdata[org_data.track].freq, iKeyPhase[iCast[wParam]]);
 				iKeyPushDown[iCast[wParam]+ iPushShift[0]*12 -iPushShift[1]*12] = 1;
 				org_data.PutMusic();//Redrawing sheet music
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
