@@ -590,6 +590,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					msgbox(hWnd, IDS_STRING64, IDS_ERROR_LOAD, MB_OK | MB_ICONWARNING);
 					break;
 				}
+
+				if (timer_sw != 0) // Stop playing song
+					SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+
 				ClearUndo(); // 2023.06.10 Someone forgot to put this here
 				org_data.InitOrgData();
 				org_data.LoadMusicData();
@@ -603,6 +607,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SelectReset();
 				org_data.PutMusic();
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+
 				//for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;	// 2014.10.18 D
 				for(j=0;j<8;j++)ucMIDIProgramChangeValue[j]=255;	// 2014.10.18 A
 				break;	// 2014.10.18 A
@@ -724,6 +729,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				/*i = 0;
 				if(LOWORD(wParam)==IDM_LOAD2 || LOWORD(wParam)==ID_AC_LOAD2)i=1; */
 				if(GetFileNameLoad(hWnd,MessageString[IDS_STRING61]/*,i*/) != MSGLOADOK) break;//"Load song data"
+				
+				if (timer_sw != 0) // Stop playing song
+					SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+				
 				ClearUndo();
 				org_data.InitOrgData();
 				org_data.LoadMusicData();
@@ -741,6 +750,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				SelectReset();
 				org_data.PutMusic();
 				RedrawWindow(hWnd,&rect,NULL,RDW_INVALIDATE|RDW_ERASENOW);
+
 				for(i=0;i<8;i++)ucMIDIProgramChangeValue[i]=255;
 				break;
 			case IDM_EXIT:
@@ -1032,7 +1042,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				ChangeFinish();
 				break;
 			case ID_AC_HOMEBACK: //home
-				SendMessage(hDlgPlayer , WM_COMMAND , IDC_START , NULL);
+				SendMessage(hDlgPlayer, WM_COMMAND, IDC_START, NULL);
 				break;
 			case ID_AC_TOEND: //home
 				SendMessage(hDlgPlayer, WM_COMMAND, IDC_END, NULL);
@@ -1264,6 +1274,9 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		}
 		strcpy(music_file, strMIDIFile);
 
+		if (timer_sw != 0) // Stop playing song
+			SendMessage(hDlgPlayer, WM_COMMAND, IDC_STOP, NULL);
+
 		ClearUndo();
 //		MessageBox(hWnd,music_file,"",MB_OK);
 		org_data.InitOrgData();
@@ -1278,6 +1291,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		SetDlgItemText(hDlgTrack,IDE_VIEWTRACK,"1");
 		SetModified(false);//title name set
         gFileUnsaved = false;
+
 		break;
 	case WM_PAINT://display message
 	{

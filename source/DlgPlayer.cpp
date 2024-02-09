@@ -109,7 +109,7 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				EnableMenuItem(hmenu,6,MF_BYPOSITION|MF_DISABLED);
 				EnableMenuItem(hmenu,7,MF_BYPOSITION|MF_DISABLED);
 				EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_DISABLED);
-				DragAcceptFiles(hWnd,FALSE);//ドラッグ禁止
+				//DragAcceptFiles(hWnd,FALSE);//ドラッグ禁止
 				//トラック ミュート のチェック
 				for(i = 0; i < MAXTRACK; i++){
 					if(SendDlgItemMessage(hDlgTrack,mute_name[i],BM_GETCHECK,0,0)){
@@ -145,7 +145,7 @@ BOOL CALLBACK DialogPlayer(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lPara
 				EnableMenuItem(hmenu,6,MF_BYPOSITION|MF_ENABLED);
 				EnableMenuItem(hmenu,7,MF_BYPOSITION|MF_ENABLED);
 				EnableMenuItem(hmenu,8,MF_BYPOSITION|MF_ENABLED);
-				DragAcceptFiles(hWnd,TRUE);//ドラッグ許可
+				//DragAcceptFiles(hWnd,TRUE);//ドラッグ許可
 				org_data.GetMusicInfo(&mi);
 				QuitMMTimer(); // Quit timer first
 				Rxo_StopAllSoundNow();	// 2010.11.30 C
