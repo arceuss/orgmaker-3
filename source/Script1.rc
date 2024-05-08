@@ -674,7 +674,7 @@ END
 
 DLGWAVEXPORT DIALOG 0, 0, 135, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
-CAPTION "Export WAV File"
+CAPTION "WAV Export"
 FONT 9, "MS PGothic"
 BEGIN
 EDITTEXT        IDE_SAMPLE_RATE, 8, 14, 30, 12
@@ -1579,6 +1579,7 @@ BEGIN
     IDS_STRING121           "An error occurred while saving the file."
     IDS_STRING122           "Sample rate is not in range (1000-192000)."
     IDS_STRING123           "Loop count must be positive."
+    IDS_STRING124           "WAV Export"
 END
 
 #endif    // English (United States) resources

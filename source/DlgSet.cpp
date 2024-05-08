@@ -1021,7 +1021,7 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 			}
 			if (fade_mseconds < 0) fade_mseconds = 0;
 
-			res = GetFileNameExportWav(hdwnd, MessageString[IDS_STRING62], strPath); //"Save As"
+			res = GetFileNameExportWav(hdwnd, MessageString[IDS_STRING124], strPath); // "WAV Export"
 			if (res == MSGCANCEL) return 1;
 			if (res == MSGEXISFILE) {
 				if (msgbox(hdwnd, IDS_NOTIFY_OVERWRITE, IDS_INFO_SAME_FILE, MB_YESNO | MB_ICONEXCLAMATION) == IDNO) return 1;
@@ -1032,6 +1032,7 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 			unsigned int streamsize = samples * sizeof(short) * 2;
 			char* stream = (char*)malloc(44 + streamsize);
 			if (stream != NULL) {
+				// This code sucks but IDC pay me and I will fix it
 				ExportOrganyaBuffer(sample_rate, (short*)(stream + 44), samples, (fade_mseconds * sample_rate / 1000));
 				memset(stream, 0, 44);
 				const char* riff = "RIFF";

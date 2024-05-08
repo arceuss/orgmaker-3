@@ -128,6 +128,7 @@
 #define IDS_STRING121                   121
 #define IDS_STRING122                   122
 #define IDS_STRING123                   123
+#define IDS_STRING124                   124
 #define IDR_ACCELERATOR1                164
 #define IDD_DIALOGOPEN                  190
 #define IDD_MIDI                        232
@@ -419,7 +420,7 @@
 #define IDD_END_BEAT                    1218
 #define IDE_SAMPLE_RATE                 1219
 #define IDE_LOOP_COUNT                  1220
-#define IDE_FADE_MSECONDS                1221
+#define IDE_FADE_MSECONDS               1221
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
