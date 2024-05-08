@@ -1,4 +1,4 @@
-OrgMaker 3   Ver3.0.7   Simple Help
+OrgMaker 3   Ver3.0.8   Simple Help
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   Basic usage is the same as "OrgMaker 1" developed by Mr. Pixel.
@@ -216,15 +216,6 @@ OrgMaker 3   Ver3.0.7   Simple Help
   * Current track ~ If the selection range is selected on
     a drum track, changes only the notes included in the range.
 
-  [Open in your own dialog] (Caution!!)
-  The common dialog mechanism does not want to save the window size on its own
-  Anyway, because it's annoying to look for files as I (for work) make a large
-  number of files in one folder and the small window size remains, this function
-  is attached in order to increase the size and keep it. And to properly hook a
-  message to the common dialog, initialization is the number of times called
-  instead of the contents of the message because the decision is pretty risky
-  I think. (May depend on the environment)
-
   [The target is always the current track]
   This is also a special feature.
   When the track changes, the selection will be changed to the current track
@@ -243,20 +234,17 @@ OrgMaker 3   Ver3.0.7   Simple Help
     * This function is mostly for my own use.
 
 
-[] Export to wav format
-    Was going to do, but was derailed. Not enough patience.
-    Whether you use LPDIRECTSOUNDCAPTUREBUFFER,
-    configure an event for the playback position of PRIMARYBUFFER
-    to regularly issue a NOTIFY event, or copy the buffer completely,
-    it's troublesome any way.
-
-
 [] Pan and Volume headers light up when you click on them.
-    They only light up in version 2.1.0. It has no significance.
+    They only light up in version 3.0.8. It has no significance.
     Clicking Select toggles the "Always Select Current Track" function.
 
 
 # Revision History 
+
+  3.0.8  2024/05/07  Added exporting to .wav format
+                     Fixed keyboard ignoring Freq. property
+                     Fixed swap tracks crash
+                     More tweaks and small bug fixes
 
   3.0.7  2024/01/22  Themes now support editing the main cursor
                      Fixed a crash with keyboard preview
