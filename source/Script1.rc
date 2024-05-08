@@ -672,6 +672,20 @@ BEGIN
     PUSHBUTTON      "Open Theme Folder",IDC_OPNTHMFLD,7,155,80,14
 END
 
+DLGWAVEXPORT DIALOG 0, 0, 86, 70
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Export WAV File"
+FONT 9, "MS PGothic"
+BEGIN
+EDITTEXT        IDE_SAMPLE_RATE, 8, 14, 30, 12
+EDITTEXT        IDE_LOOP_COUNT, 48, 14, 20, 12
+DEFPUSHBUTTON   "OK", IDOK, 8, 52, 32, 14
+PUSHBUTTON      "Cancel", IDCANCEL, 44, 52, 32, 14
+LTEXT           "Sample Rate", IDC_STATIC, 7, 4, 70, 8
+LTEXT           "Loop Count", IDC_STATIC, 48, 4, 70, 8
+LTEXT           "0 loops plays the song once.", IDC_STATIC, 7, 30, 70, 16
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -843,6 +857,7 @@ BEGIN
         MENUITEM "Save &As...\tCtrl+Shift+S",   IDM_SAVENEW
         MENUITEM SEPARATOR
         MENUITEM "Export",                      ID_EXPORT, INACTIVE
+        MENUITEM "  &WAV File (*.wav)...\tCtrl+Alt+W",  IDM_EXPORT_WAV
         MENUITEM "  &MIDI File (*.mid)...\tCtrl+Alt+M", IDM_EXPORT_MIDI
         MENUITEM SEPARATOR
         MENUITEM "Recent Files",                ID_MENUITEM40135, INACTIVE
@@ -1287,6 +1302,7 @@ BEGIN
     "I",            ID_AC_SI,               VIRTKEY, SHIFT, NOINVERT
     "L",            ID_AC_CT_PAN_L,         VIRTKEY, SHIFT, CONTROL, NOINVERT
     "M",            ID_AC_MIDI,             VIRTKEY, CONTROL, ALT, NOINVERT
+    "W",            ID_AC_WAV,              VIRTKEY, CONTROL, ALT, NOINVERT
     "N",            ID_AC_ML_KEY_DOWN,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "O",            ID_AC_PRESS_RIGHT,      VIRTKEY, NOINVERT
     "O",            ID_AC_MENUOPEN,         VIRTKEY, CONTROL, NOINVERT
@@ -1543,7 +1559,7 @@ BEGIN
     IDS_GRID_STRING         "Custom Setting!4 Beat:4 Step!4 Beat:3 Step!3 Beat:4 Step!3 Beat:3 Step!4 Beat:6 Step!3 Beat:6 Step!4 Beat:2 Step!4 Beat:8 Step!4 Beat:12 Step!5 Beat:4 Step!!"
     IDS_STRING108           "Default Pan/Volume Data (*.pvi)!*.pvi!All Files (*.*)!*.*!!"
     IDS_STRING109           "Organya Data (*.org)!*.org!All Files (*.*)!*.*!!"
-    IDS_STRING110           "Standard MIDI File (*.mid)!*.mid!All Files (*.*)!*.*!!"
+    IDS_STRING110           "MIDI File (*.mid)!*.mid!All Files (*.*)!*.*!!"
     IDS_STRING111           "Organya Data (*.org)!*.org!All Files (*.*)!*.*!!"
 END
 
@@ -1556,6 +1572,11 @@ BEGIN
     IDS_STRING116           "All tracks from beginning to end"
     IDS_STRING117           "Wave-%02d*"
     IDS_STRING118           "Wave-%02d"
+    IDS_STRING119           "WAV File (*.wav)!*.wav!All Files (*.*)!*.*!!"
+    IDS_STRING120           "Export Failed"
+    IDS_STRING121           "An error occurred while saving the file."
+    IDS_STRING122           "Sample rate is not in range (1000-192000)."
+    IDS_STRING123           "Loop count must be positive."
 END
 
 #endif    // English (United States) resources

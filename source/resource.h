@@ -123,6 +123,11 @@
 #define IDS_STRING116                   116
 #define IDS_STRING117                   117
 #define IDS_STRING118                   118
+#define IDS_STRING119                   119
+#define IDS_STRING120                   120
+#define IDS_STRING121                   121
+#define IDS_STRING122                   122
+#define IDS_STRING123                   123
 #define IDR_ACCELERATOR1                164
 #define IDD_DIALOGOPEN                  190
 #define IDD_MIDI                        232
@@ -412,6 +417,8 @@
 #define IDC_END                         1216
 #define IDD_REP_BEAT                    1217
 #define IDD_END_BEAT                    1218
+#define IDE_SAMPLE_RATE                 1219
+#define IDE_LOOP_COUNT                  1220
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005
@@ -682,14 +689,16 @@
 #define ID_AC_MEASNEXT                  40294
 #define ID_AC_SOCTUP                    40295
 #define ID_AC_SOCTDOWN                  40296
+#define IDM_EXPORT_WAV                  40297
+#define ID_AC_WAV                       40298
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        239
-#define _APS_NEXT_COMMAND_VALUE         40297
-#define _APS_NEXT_CONTROL_VALUE         1219
+#define _APS_NEXT_COMMAND_VALUE         40299
+#define _APS_NEXT_CONTROL_VALUE         1221
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

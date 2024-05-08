@@ -56,6 +56,7 @@ BOOL CALLBACK DialogHelp(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CALLBACK DialogEZCopy(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogSwap(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DialogTheme(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void SetModified(bool mod);
 void CheckLoupeMenu(void);
@@ -718,6 +719,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				org_data.ExportMIDIData(strMIDIFile, iDlgRepeat);
 				//SetTitlebarText();//title name set
 				//ResetTitlebarChange();
+				break;
+			case IDM_EXPORT_WAV:
+			case ID_AC_WAV:
+				DialogBox(hInst, "DLGWAVEXPORT", hwnd, DialogWavExport);
 				break;
 			case IDM_DUMMY_TATE_SEPARATOR: //do nothing
 				break;

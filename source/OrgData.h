@@ -76,7 +76,7 @@ typedef struct OrgData{
 		unsigned char def_pan[MAXTRACK];
 		unsigned char def_volume[MAXTRACK];
 		void InitOrgData(void);
-		void GetMusicInfo(MUSICINFO *mi);//曲情報を取得
+		void GetMusicInfo(MUSICINFO *mi, int mode = 0);//曲情報を取得
 		//曲情報を設定。flagは設定アイテムを指定
 		BOOL SetMusicInfo(MUSICINFO *mi,unsigned long flag);
 		BOOL NoteAlloc(unsigned short note_num);//指定の数だけNoteDataの領域を確保
@@ -131,7 +131,7 @@ typedef struct OrgData{
 		BOOL SwapTrack(NOTECOPY *pc); //[新]トラックを入れ替える 2014.05.10
 		BOOL ExportMIDIData(char *strMidiFileName, int iRepeat); //MIDIｴｸｽﾎﾟｰﾄ,繰り返し回数 2014.05.11
 
-
+		unsigned short GetWait(void);
 
 	bool CopyNoteDataToCB(NOTECOPY *nc, int iTrack, int iFullTrack);
 }ORGDATA;

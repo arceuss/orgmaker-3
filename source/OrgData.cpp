@@ -50,7 +50,7 @@ void OrgData::ReleaseNote(void)
 	}
 }
 //‹Èî•ñ‚ğæ“¾
-void OrgData::GetMusicInfo(MUSICINFO *mi){
+void OrgData::GetMusicInfo(MUSICINFO *mi, int mode) {
 	mi->dot = info.dot;
 	mi->line = info.line;
 	mi->alloc_note = info.alloc_note;
@@ -61,8 +61,17 @@ void OrgData::GetMusicInfo(MUSICINFO *mi){
 		mi->tdata[i].freq = info.tdata[i].freq;
 		mi->tdata[i].wave_no = info.tdata[i].wave_no;
 		mi->tdata[i].pipi = info.tdata[i].pipi;
+		if (mode == 1) {
+			mi->tdata[i].note_list = info.tdata[i].note_list;
+			mi->tdata[i].note_p = info.tdata[i].note_p;
+		}
 	}
 }
+
+unsigned short OrgData::GetWait(void) {
+	return info.wait;
+}
+
 bool OrgData::PutBackGround(void)
 {
 	if(!MakeMusicParts(info.line,info.dot))return false;//ƒp[ƒc‚ğ¶¬

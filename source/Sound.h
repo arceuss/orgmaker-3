@@ -4,6 +4,17 @@
 
 //#include <dsound.h>
 
+typedef struct {
+	short wave_size;//波形のサイズ
+	short oct_par;//オクターブを実現する掛け率(/8)
+	short oct_size;//オクターブを実現する掛け率(/8)
+} OCTWAVE;
+
+extern OCTWAVE oct_wave[8];
+extern double freq_tbl[12];
+extern short pan_tbl[13];
+extern char *wave_data;
+
 // DirectSoundの開始
 BOOL InitDirectSound(HWND hwnd);
 BOOL LoadSoundObject( char *file_name, int no);

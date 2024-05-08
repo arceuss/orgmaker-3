@@ -9,9 +9,11 @@
 #include "resource.h"
 #include "OrgData.h"
 #include "Gdi.h"
+#include "Filer.h"
 #include <commctrl.h>
 #include "Mouse.h"
 #include "rxoFunction.h"
+#include "OrgExport.h"
 
 #define PI 3.14159265358979323846
 
@@ -955,6 +957,7 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 //	char str[10] = {NULL};
 	switch(message){
 	case WM_INITDIALOG://ダイアログが呼ばれた
+
 		EnableDialogWindow(FALSE);
 		return 1;
 	case WM_COMMAND:
@@ -971,6 +974,96 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		return 1;
 	
+	}
+	return 0;
+}
+
+BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	MUSICINFO mi;
+	FILE* deez;
+	char res;
+	char strPath[MAX_PATH] = {NULL};
+	switch (message) {
+	case WM_INITDIALOG:
+		//SetDlgItemText(hdwnd, IDE_LOOP_COUNT, "0");
+		EnableDialogWindow(FALSE);
+		return 1;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			char str[7] = { NULL };
+			unsigned long sample_rate;
+			GetDlgItemText(hdwnd, IDE_SAMPLE_RATE, str, 7);
+			sample_rate = atol(str);
+			unsigned long loop_count;
+			GetDlgItemText(hdwnd, IDE_LOOP_COUNT, str, 7);
+			loop_count = atol(str);
+
+			if (sample_rate < 1000 || sample_rate > 192000) {
+				msgbox(hdwnd, IDS_STRING122, IDS_ERROR, MB_OK); // Not in range
+				return 1;
+			}
+			if (loop_count < 0) {
+				msgbox(hdwnd, IDS_STRING121, IDS_ERROR, MB_OK);
+				return 1;
+			}
+
+			res = GetFileNameExportWav(hdwnd, MessageString[IDS_STRING62], strPath); //"Save As"
+			if (res == MSGCANCEL) return 1;
+			if (res == MSGEXISFILE) {
+				if (msgbox(hdwnd, IDS_NOTIFY_OVERWRITE, IDS_INFO_SAME_FILE, MB_YESNO | MB_ICONEXCLAMATION) == IDNO) return 1;
+			}
+
+			org_data.GetMusicInfo(&mi);
+			unsigned int samples = ((mi.wait * sample_rate) / 1000) * (mi.end_x + ((mi.end_x - mi.repeat_x) * loop_count));
+			unsigned int streamsize = samples * sizeof(short) * 2;
+			char* stream = (char*)malloc(44 + streamsize);
+			if (stream != NULL) {
+				ExportOrganyaBuffer(sample_rate, (short*)(stream + 44), samples);
+				memset(stream, 0, 44);
+				const char* riff = "RIFF";
+				const char* fmt = "fmt ";
+				const char* wave = "WAVE";
+				const char* data = "data";
+				memcpy(stream, riff, 4);
+				unsigned int fullsize = 36 + streamsize;
+				memcpy(stream + 4, &fullsize, 4);
+				memcpy(stream + 8, wave, 4);
+				memcpy(stream + 12, fmt, 4);
+				stream[16] = 16;
+				stream[20] = 1;
+				stream[22] = 2;
+				memcpy(stream + 24, &sample_rate, 4);
+				unsigned int strangemath = sample_rate * sizeof(short) * 2;
+				memcpy(stream + 28, &strangemath, 4);
+				stream[32] = 4;
+				stream[34] = 16;
+				memcpy(stream + 36, data, 4);
+				memcpy(stream + 40, &streamsize, 4);
+
+				FILE* fl = fopen(strPath, "wb");
+				if (fl != NULL) {
+					fwrite(stream, 1, 44 + streamsize, fl);
+					fclose(fl);
+				} else {
+					msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
+				}
+				free(stream);
+			} else {
+				msgbox(hdwnd, IDS_STRING121, IDS_STRING120, MB_OK);
+			}
+
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		}
+		case IDCANCEL:
+			EnableDialogWindow(TRUE);
+			EndDialog(hdwnd, 0);
+			return 1;
+		}
+		return 1;
 	}
 	return 0;
 }

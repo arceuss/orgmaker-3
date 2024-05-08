@@ -4,6 +4,7 @@
 #include <dsound.h>
 #include "Setting.h"
 #include "DefOrg.h"
+#include "Sound.h"
 #define SE_MAX	512
 
 // シンボル定義.
@@ -234,12 +235,6 @@ void ChangeSoundPan(int no, long pan)//512がMAXで256がﾉｰﾏﾙ
 /////////////////////
 
 
-typedef struct{
-	short wave_size;//波形のサイズ
-	short oct_par;//オクターブを実現する掛け率(/8)
-	short oct_size;//オクターブを実現する掛け率(/8)
-}OCTWAVE;
-
 OCTWAVE oct_wave[8] = {
 	{256,  1, 4},//0 Oct
 	{256,  2, 8},//1 Oct
@@ -250,6 +245,7 @@ OCTWAVE oct_wave[8] = {
 	{ 16, 64, 28},
 	{  8,128, 32},
 };
+
 BYTE format_tbl2[] = {0x01,0x00,0x01,0x00,0x22,0x56,0x00,//22050HzのFormat
 0x00,0x22,0x56,0x00,0x00,0x01,0x00,0x08,0x00,0x00,0x00};
 //BYTE format_tbl3[] = {0x01,0x00,0x01,0x00,0x44,0xac,0x00,//441000HzのFormat

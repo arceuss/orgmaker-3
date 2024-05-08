@@ -36,7 +36,7 @@ extern unsigned char ucMIDIProgramChangeValue[MAXTRACK];
 char GetFileNameSave(HWND hwnd,char *title)
 {//ファイル名を取得(セーブ)
 	OPENFILENAME ofn;
-	FILE *fp;
+	//FILE *fp;
 //	char res;//ファイルオープンの結果
 
 	memset(&ofn,0,sizeof(OPENFILENAME));
@@ -55,7 +55,7 @@ char GetFileNameSave(HWND hwnd,char *title)
 	//ファイル名取得を試みる。
 	if(GetSaveFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
 	else return MSGCANCEL;//キャンセルで0が返る
-	fp = fopen(music_file,"rb");
+	//fp = fopen(music_file,"rb");
 	//既存ファイルが存在する？ OFN_OVERWRITEPROMPT 指定で不要とした。
 	//if(fp != NULL){
 	//	fclose(fp);
@@ -170,7 +170,7 @@ UINT CALLBACK OFNHookProcMID(HWND hdlg, UINT msg, WPARAM wParam, LPARAM lParam)
 char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 {//ファイル名を取得(MIDI)
 	OPENFILENAME ofn;
-	FILE *fp;
+	//FILE *fp;
 //	char res;//ファイルオープンの結果
 
 	memset(&ofn,0,sizeof(OPENFILENAME));
@@ -205,7 +205,7 @@ char GetFileNameMIDI(HWND hwnd,char *title, char *filename)
 	//ファイル名取得を試みる。
 	if(GetSaveFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
 	else return MSGCANCEL;//キャンセルで0が返る
-	fp = fopen(filename,"rb");
+	//fp = fopen(filename,"rb");
 
 	//既存ファイルが存在する？  OFN_OVERWRITEPROMPT 指定で不要とした。
 	//if(fp != NULL){
@@ -297,4 +297,39 @@ char GetFileNameLoad(HWND hwnd,char *title/*, int OpenType*/)
 	strcpy(music_file, mfile);
 
 	return MSGLOADOK;
+}
+
+char GetFileNameExportWav(HWND hwnd, char* title, char* filename)
+{
+	OPENFILENAME ofn;
+	//FILE* fp;
+
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	strcpy(filename, music_file);
+	char* p;
+	if ((p = strstr(filename, ".org")) != NULL) {
+		strcpy(p, ".wav");
+	}
+
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = hwnd;
+	ofn.hInstance = hInst;
+	//ofn.lpstrFilter = "OrganyaData[*.org]\0*.org\0全ての形式 [*.*]\0*.*\0\0";	// 2014.10.19 D
+	ofn.lpstrFilter = MessageString[IDS_STRING119];	// 2014.10.19 A
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = title;
+	ofn.Flags = OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_CREATEPROMPT | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = "wav";
+
+	//ファイル名取得を試みる。
+	if (GetSaveFileName(&ofn));//InvalidateRect(hwnd,NULL,TRUE);
+	else return MSGCANCEL;//キャンセルで0が返る
+	//fp = fopen(filename, "rb");
+	//既存ファイルが存在する？ OFN_OVERWRITEPROMPT 指定で不要とした。
+	//if(fp != NULL){
+	//	fclose(fp);
+	//	return MSGEXISFILE;//既存ファイル
+	//}
+	return MSGSAVEOK;
 }
