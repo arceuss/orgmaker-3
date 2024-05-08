@@ -248,28 +248,28 @@ static void MelodyPitch(unsigned char key, signed char track, long a)
 	}
 }
 
-static unsigned char old_key[MAXMELODY] = { 255,255,255,255,255,255,255,255 };
-static unsigned char key_on[MAXMELODY] = { 0 };
-static unsigned char key_twin[MAXMELODY] = { 0 };
+static unsigned char s_old_key[MAXMELODY] = { 255,255,255,255,255,255,255,255 };
+static unsigned char s_key_on[MAXMELODY] = { 0 };
+static unsigned char s_key_twin[MAXMELODY] = { 0 };
 
 static void MelodyPan(unsigned char key, unsigned char pan, signed char track) {
-	if (old_key[track] != PANDUMMY)
-		S_SetSoundPan(melodyObject[track][old_key[track] / 12][key_twin[track]], (pan_tbl[pan] - 0x100) * 10);
+	if (s_old_key[track] != PANDUMMY)
+		S_SetSoundPan(melodyObject[track][s_old_key[track] / 12][s_key_twin[track]], (pan_tbl[pan] - 0x100) * 10);
 }
 
 static void MelodyVolume(int no, long volume, signed char track) {
-	if (old_key[track] != VOLDUMMY)
-		S_SetSoundVolume(melodyObject[track][old_key[track] / 12][key_twin[track]], (volume - 0xFF) * 8);
+	if (s_old_key[track] != VOLDUMMY)
+		S_SetSoundVolume(melodyObject[track][s_old_key[track] / 12][s_key_twin[track]], (volume - 0xFF) * 8);
 }
 
 static void PlayMelody(unsigned char key, int mode, signed char track, long freq, signed char pipi)
 {
-	if (melodyObject[track][key / 12][key_twin[track]] != NULL) {
+	if (melodyObject[track][key / 12][s_key_twin[track]] != NULL) {
 		switch (mode) {
 		case 0:
-			if (old_key[track] != 0xFF) {
-				S_StopSound(melodyObject[track][old_key[track] / 12][key_twin[track]]);
-				S_RewindSound(melodyObject[track][old_key[track] / 12][key_twin[track]]);
+			if (s_old_key[track] != 0xFF) {
+				S_StopSound(melodyObject[track][s_old_key[track] / 12][s_key_twin[track]]);
+				S_RewindSound(melodyObject[track][s_old_key[track] / 12][s_key_twin[track]]);
 			}
 			break;
 
@@ -277,32 +277,32 @@ static void PlayMelody(unsigned char key, int mode, signed char track, long freq
 			break;
 
 		case 2:
-			if (old_key[track] != 0xFF) {
-				if (pipi == 0) S_PlaySound(melodyObject[track][old_key[track] / 12][key_twin[track]], false);
-				old_key[track] = 0xFF;
+			if (s_old_key[track] != 0xFF) {
+				if (pipi == 0) S_PlaySound(melodyObject[track][s_old_key[track] / 12][s_key_twin[track]], false);
+				s_old_key[track] = 0xFF;
 			}
 			break;
 
 		case -1:
-			if (old_key[track] == 0xFF) {
+			if (s_old_key[track] == 0xFF) {
 				MelodyPitch(key % 12, track, freq);	// 周波数を設定して (Set the frequency)
-				S_PlaySound(melodyObject[track][key / 12][key_twin[track]], pipi == 0);
-				old_key[track] = key;
-				key_on[track] = 1;
-			} else if (key_on[track] == 1 && old_key[track] == key) {
-				if (pipi == 0) S_PlaySound(melodyObject[track][old_key[track] / 12][key_twin[track]], false);
-				key_twin[track]++;
-				if (key_twin[track] > 1)
-					key_twin[track] = 0;
-				S_PlaySound(melodyObject[track][key / 12][key_twin[track]], pipi == 0);
+				S_PlaySound(melodyObject[track][key / 12][s_key_twin[track]], pipi == 0);
+				s_old_key[track] = key;
+				s_key_on[track] = 1;
+			} else if (s_key_on[track] == 1 && s_old_key[track] == key) {
+				if (pipi == 0) S_PlaySound(melodyObject[track][s_old_key[track] / 12][s_key_twin[track]], false);
+				s_key_twin[track]++;
+				if (s_key_twin[track] > 1)
+					s_key_twin[track] = 0;
+				S_PlaySound(melodyObject[track][key / 12][s_key_twin[track]], pipi == 0);
 			} else {
-				if (pipi == 0) S_PlaySound(melodyObject[track][old_key[track] / 12][key_twin[track]], false);	// 今なっているのを歩かせ停止 (Stop playback now)
-				key_twin[track]++;
-				if (key_twin[track] > 1)
-					key_twin[track] = 0;
+				if (pipi == 0) S_PlaySound(melodyObject[track][s_old_key[track] / 12][s_key_twin[track]], false);	// 今なっているのを歩かせ停止 (Stop playback now)
+				s_key_twin[track]++;
+				if (s_key_twin[track] > 1)
+					s_key_twin[track] = 0;
 				MelodyPitch(key % 12, track, freq);
-				S_PlaySound(melodyObject[track][key / 12][key_twin[track]], pipi == 0);
-				old_key[track] = key;
+				S_PlaySound(melodyObject[track][key / 12][s_key_twin[track]], pipi == 0);
+				s_old_key[track] = key;
 			}
 
 			break;
@@ -350,63 +350,63 @@ static void PlayDrum(unsigned char key, int mode, signed char track)
 	}
 }
 
-static long play_p;
-static NOTELIST* np[MAXTRACK];
-static long now_leng[MAXMELODY] = { 0 };
+static long s_play_p = 0;
+static NOTELIST *s_np[MAXTRACK] = {NULL};
+static long s_now_leng[MAXMELODY] = {0};
 
-static void SetPlayPos(MUSICINFO* info, long x)
+static void SetPlayPos(MUSICINFO *info, long x)
 {
 	for (int i = 0; i < MAXTRACK; i++) {
-		np[i] = info->tdata[i].note_list;
-		while (np[i] != NULL && np[i]->x < x)
-			np[i] = np[i]->to;
+		s_np[i] = info->tdata[i].note_list;
+		while (s_np[i] != NULL && s_np[i]->x < x)
+			s_np[i] = s_np[i]->to;
 	}
 
-	play_p = x;
+	s_play_p = x;
 }
 
-static void PlayData(MUSICINFO* info)
+static void PlayData(MUSICINFO *info)
 {
 	int i;
 	for (i = 0; i < MAXMELODY; i++) {
-		if (np[i] != NULL && play_p == np[i]->x) {
-			if (np[i]->y != KEYDUMMY) {
-				PlayMelody(np[i]->y, -1, i, info->tdata[i].freq, info->tdata[i].pipi);
-				now_leng[i] = np[i]->length;
+		if (s_np[i] != NULL && s_play_p == s_np[i]->x) {
+			if (s_np[i]->y != KEYDUMMY) {
+				PlayMelody(s_np[i]->y, -1, i, info->tdata[i].freq, info->tdata[i].pipi);
+				s_now_leng[i] = s_np[i]->length;
 			}
-			if (np[i]->pan != PANDUMMY)
-				MelodyPan(np[i]->y, np[i]->pan, i);
-			if (np[i]->volume != VOLDUMMY)
-				MelodyVolume(np[i]->y, np[i]->volume * 100 / 0x7F, i);
-			np[i] = np[i]->to;
+			if (s_np[i]->pan != PANDUMMY)
+				MelodyPan(s_np[i]->y, s_np[i]->pan, i);
+			if (s_np[i]->volume != VOLDUMMY)
+				MelodyVolume(s_np[i]->y, s_np[i]->volume * 100 / 0x7F, i);
+			s_np[i] = s_np[i]->to;
 		}
-		if (now_leng[i] == 0)
+		if (s_now_leng[i] == 0)
 			PlayMelody(0, 2, i, info->tdata[i].freq, info->tdata[i].pipi);
-		if (now_leng[i] > 0)
-			now_leng[i]--;
+		if (s_now_leng[i] > 0)
+			s_now_leng[i]--;
 	}
 	for (i = MAXMELODY; i < MAXTRACK; i++) {
-		if (np[i] != NULL && play_p == np[i]->x) {
-			if (np[i]->y != KEYDUMMY)
-				PlayDrum(np[i]->y, 1, i - MAXMELODY);
-			if (np[i]->pan != PANDUMMY)
-				DrumPan(np[i]->pan, i - MAXMELODY);
-			if (np[i]->volume != VOLDUMMY)
-				DrumVolume(np[i]->volume * 100 / 0x7F, i - MAXMELODY);
-			np[i] = np[i]->to;
+		if (s_np[i] != NULL && s_play_p == s_np[i]->x) {
+			if (s_np[i]->y != KEYDUMMY)
+				PlayDrum(s_np[i]->y, 1, i - MAXMELODY);
+			if (s_np[i]->pan != PANDUMMY)
+				DrumPan(s_np[i]->pan, i - MAXMELODY);
+			if (s_np[i]->volume != VOLDUMMY)
+				DrumVolume(s_np[i]->volume * 100 / 0x7F, i - MAXMELODY);
+			s_np[i] = s_np[i]->to;
 		}
 	}
-	play_p++;
-	if (play_p >= info->end_x) {
-		play_p = info->repeat_x;
-		SetPlayPos(info, play_p);
+	s_play_p++;
+	if (s_play_p >= info->end_x) {
+		s_play_p = info->repeat_x;
+		SetPlayPos(info, s_play_p);
 	}
 }
 
 extern char* dram_name[];
 
-void ExportOrganyaBuffer(unsigned long sample_rate, short* output_stream, size_t frames_total) {
-	int i, j, k;
+void ExportOrganyaBuffer(unsigned long sample_rate, short* output_stream, size_t frames_total, size_t fade_frames) {
+	int j, k, l;
 	MUSICINFO mi;
 	org_data.GetMusicInfo(&mi, 1);
 	
@@ -426,25 +426,31 @@ void ExportOrganyaBuffer(unsigned long sample_rate, short* output_stream, size_t
 	short* stream = output_stream;
 	size_t frames_done = 0;
 	while (frames_done != frames_total) {
-		long mix_buffer[0x800 * 2];
-		size_t subframes = MIN(0x800, frames_total - frames_done);
+		long mix_buffer[0x400 * 2];
+		size_t subframes = MIN(0x400, frames_total - frames_done);
 		memset(mix_buffer, 0, subframes * sizeof(long) * 2);
 		if (organya_timer == 0) {
 			S_MixSounds(mix_buffer, subframes);
 		} else {
-			unsigned int frame_done = 0;
-			while (frame_done != subframes) {
+			unsigned int subframes_done = 0;
+			while (subframes_done != subframes) {
 				if (organya_countdown == 0) {
 					organya_countdown = (organya_timer * output_frequency) / 1000;
 					PlayData(&mi);
 				}
-				const unsigned int frames_to_do = MIN(organya_countdown, subframes - frame_done);
-				S_MixSounds(mix_buffer + frame_done * 2, frames_to_do);
-				frame_done += frames_to_do;
+				const unsigned int frames_to_do = MIN(organya_countdown, subframes - subframes_done);
+				S_MixSounds(mix_buffer + subframes_done * 2, frames_to_do);
+				subframes_done += frames_to_do;
 				organya_countdown -= frames_to_do;
 			}
 		}
 		for (size_t i = 0; i < subframes * 2; ++i) {
+			if (fade_frames > 0 && frames_done + i / 2 > frames_total - fade_frames) {
+				if (i % 2 == 0)
+					j = (unsigned short)((fade_frames - ((frames_done + i / 2) - (frames_total - fade_frames))) * 256 / fade_frames);
+				mix_buffer[i] = (mix_buffer[i] * j) >> 8;
+			}
+
 			if (mix_buffer[i] > 0x7FFF)
 				*stream++ = 0x7FFF;
 			else if (mix_buffer[i] < -0x7FFF)
@@ -463,16 +469,16 @@ void ExportOrganyaBuffer(unsigned long sample_rate, short* output_stream, size_t
 		free(pSound);
 	}
 	sound_list_head = NULL;
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			for (k = 0; k < 2; k++) {
-				melodyObject[i][j][k] = NULL;
+	for (j = 0; j < 8; j++) {
+		for (k = 0; k < 8; k++) {
+			for (l = 0; l < 2; l++) {
+				melodyObject[j][k][l] = NULL;
 			}
 		}
-		old_key[i] = 0xFF;
-		key_on[i] = 0;
-		key_twin[i] = 0;
-		now_leng[i] = 0;
-		drumObject[i] = NULL;
+		s_old_key[j] = 0xFF;
+		s_key_on[j] = 0;
+		s_key_twin[j] = 0;
+		s_now_leng[j] = 0;
+		drumObject[j] = NULL;
 	}
 }

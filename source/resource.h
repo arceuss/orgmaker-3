@@ -419,6 +419,7 @@
 #define IDD_END_BEAT                    1218
 #define IDE_SAMPLE_RATE                 1219
 #define IDE_LOOP_COUNT                  1220
+#define IDE_FADE_MSECONDS                1221
 #define IDM_DLGWAIT                     40003
 #define IDM_DLGTRACK                    40004
 #define IDM_DLGWAVE                     40005

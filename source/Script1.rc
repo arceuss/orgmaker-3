@@ -672,18 +672,20 @@ BEGIN
     PUSHBUTTON      "Open Theme Folder",IDC_OPNTHMFLD,7,155,80,14
 END
 
-DLGWAVEXPORT DIALOG 0, 0, 86, 70
+DLGWAVEXPORT DIALOG 0, 0, 135, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "Export WAV File"
 FONT 9, "MS PGothic"
 BEGIN
 EDITTEXT        IDE_SAMPLE_RATE, 8, 14, 30, 12
-EDITTEXT        IDE_LOOP_COUNT, 48, 14, 20, 12
-DEFPUSHBUTTON   "OK", IDOK, 8, 52, 32, 14
-PUSHBUTTON      "Cancel", IDCANCEL, 44, 52, 32, 14
+EDITTEXT        IDE_LOOP_COUNT, 48, 14, 30, 12
+EDITTEXT        IDE_FADE_MSECONDS, 88, 14, 30, 12
+DEFPUSHBUTTON   "OK", IDOK, 60, 44, 32, 14
+PUSHBUTTON      "Cancel", IDCANCEL, 96, 44, 32, 14
 LTEXT           "Sample Rate", IDC_STATIC, 7, 4, 70, 8
-LTEXT           "Loop Count", IDC_STATIC, 48, 4, 70, 8
-LTEXT           "0 loops plays the song once.", IDC_STATIC, 7, 30, 70, 16
+LTEXT           "Loop Count", IDC_STATIC, 47, 4, 70, 8
+LTEXT           "Fade Out (ms)", IDC_STATIC, 87, 4, 70, 8
+LTEXT           "0 loops will play the song once.", IDC_STATIC, 7, 30, 120, 8
 END
 
 

@@ -978,6 +978,10 @@ BOOL CALLBACK DialogMemo(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+static unsigned long sample_rate = 0;
+static unsigned long loop_count = 0;
+static unsigned long fade_mseconds = 0;
+
 BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	MUSICINFO mi;
@@ -985,20 +989,27 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 	char res;
 	char strPath[MAX_PATH] = {NULL};
 	switch (message) {
-	case WM_INITDIALOG:
-		//SetDlgItemText(hdwnd, IDE_LOOP_COUNT, "0");
+	case WM_INITDIALOG: {
+		char str[10] = { NULL };
+		itoa(sample_rate, str, 10);
+		SetDlgItemText(hdwnd, IDE_SAMPLE_RATE, str);
+		itoa(loop_count, str, 10);
+		SetDlgItemText(hdwnd, IDE_LOOP_COUNT, str);
+		itoa(fade_mseconds, str, 10);
+		SetDlgItemText(hdwnd, IDE_FADE_MSECONDS, str);
 		EnableDialogWindow(FALSE);
 		return 1;
+	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			char str[7] = { NULL };
-			unsigned long sample_rate;
+			char str[10] = { NULL };
 			GetDlgItemText(hdwnd, IDE_SAMPLE_RATE, str, 7);
 			sample_rate = atol(str);
-			unsigned long loop_count;
 			GetDlgItemText(hdwnd, IDE_LOOP_COUNT, str, 7);
 			loop_count = atol(str);
+			GetDlgItemText(hdwnd, IDE_FADE_MSECONDS, str, 7);
+			fade_mseconds = atol(str);
 
 			if (sample_rate < 1000 || sample_rate > 192000) {
 				msgbox(hdwnd, IDS_STRING122, IDS_ERROR, MB_OK); // Not in range
@@ -1008,6 +1019,7 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 				msgbox(hdwnd, IDS_STRING121, IDS_ERROR, MB_OK);
 				return 1;
 			}
+			if (fade_mseconds < 0) fade_mseconds = 0;
 
 			res = GetFileNameExportWav(hdwnd, MessageString[IDS_STRING62], strPath); //"Save As"
 			if (res == MSGCANCEL) return 1;
@@ -1016,11 +1028,11 @@ BOOL CALLBACK DialogWavExport(HWND hdwnd, UINT message, WPARAM wParam, LPARAM lP
 			}
 
 			org_data.GetMusicInfo(&mi);
-			unsigned int samples = ((mi.wait * sample_rate) / 1000) * (mi.end_x + ((mi.end_x - mi.repeat_x) * loop_count));
+			unsigned int samples = ((mi.wait * sample_rate) / 1000) * (mi.end_x + ((mi.end_x - mi.repeat_x) * loop_count)) + (fade_mseconds * sample_rate / 1000);
 			unsigned int streamsize = samples * sizeof(short) * 2;
 			char* stream = (char*)malloc(44 + streamsize);
 			if (stream != NULL) {
-				ExportOrganyaBuffer(sample_rate, (short*)(stream + 44), samples);
+				ExportOrganyaBuffer(sample_rate, (short*)(stream + 44), samples, (fade_mseconds * sample_rate / 1000));
 				memset(stream, 0, 44);
 				const char* riff = "RIFF";
 				const char* fmt = "fmt ";
