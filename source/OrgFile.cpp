@@ -256,6 +256,7 @@ BOOL OrgData::LoadMusicData(void)
 		for(i = 0; i < org_data.tdata[j].note_num; i++){
 			if (i >= info.alloc_note) { fseek(fp, sizeof(unsigned char), SEEK_CUR); continue; }
 			fread(&np->y,      sizeof(unsigned char), 1, fp);
+			if (np->y >= 96) np->y = KEYDUMMY; // another fix
 			np++;
 		}
 		np = info.tdata[j].note_p;//’·‚³
